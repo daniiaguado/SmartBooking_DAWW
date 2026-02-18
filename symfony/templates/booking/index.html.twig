@@ -1,0 +1,164 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reservas{% endblock %}
+{% block page_title %}<i class="bi bi-calendar3 me-2 text-primary"></i>
+    {{ is_admin ? 'Todas las Reservas' : 'Mis Reservas' }}
+{% endblock %}
+
+{% block body %}
+
+{# Angular booking filter component #}
+<app-booking-filter
+    current-estado="{{ filtros.estado ?? '' }}"
+    current-desde="{{ filtros.desde ? filtros.desde|date('Y-m-d') : '' }}"
+    current-hasta="{{ filtros.hasta ? filtros.hasta|date('Y-m-d') : '' }}"
+    filter-action="{{ path('app_booking_index') }}">
+</app-booking-filter>
+
+{# Filtros HTML (fallback sin Angular) #}
+<div class="sb-card mb-4" id="filtros-fallback">
+    <div class="card-body">
+        <form method="get" action="{{ path('app_booking_index') }}" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">Estado</label>
+                <select name="estado" class="form-select form-select-sm">
+                    <option value="">Todos</option>
+                    <option value="pendiente"  {{ filtros.estado == 'pendiente'  ? 'selected' }}>Pendiente</option>
+                    <option value="confirmada" {{ filtros.estado == 'confirmada' ? 'selected' }}>Confirmada</option>
+                    <option value="cancelada"  {{ filtros.estado == 'cancelada'  ? 'selected' }}>Cancelada</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">Desde</label>
+                <input type="date" name="desde" class="form-control form-control-sm"
+                       value="{{ filtros.desde ? filtros.desde|date('Y-m-d') : '' }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">Hasta</label>
+                <input type="date" name="hasta" class="form-control form-control-sm"
+                       value="{{ filtros.hasta ? filtros.hasta|date('Y-m-d') : '' }}">
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="bi bi-search me-1"></i>Filtrar
+                </button>
+                <a href="{{ path('app_booking_index') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-x-circle me-1"></i>Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="sb-card">
+    <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4 d-flex align-items-center justify-content-between">
+        <h5 class="fw-bold mb-0">
+            <span class="badge bg-secondary me-2">{{ bookings|length }}</span>reservas encontradas
+        </h5>
+        <a href="{{ path('app_booking_new') }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-lg me-1"></i>Nueva Reserva
+        </a>
+    </div>
+    <div class="card-body px-4">
+        {% if bookings is empty %}
+            <div class="text-center py-5">
+                <i class="bi bi-calendar-x display-4 text-muted"></i>
+                <p class="text-muted mt-3">No se encontraron reservas.</p>
+                <a href="{{ path('app_booking_new') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i>Crear reserva
+                </a>
+            </div>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" id="bookingsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            {% if is_admin %}<th>Usuario</th>{% endif %}
+                            <th>Recurso</th>
+                            <th>Inicio</th>
+                            <th>Fin</th>
+                            <th>Duración</th>
+                            <th>Asistentes</th>
+                            <th>Estado</th>
+                            <th>Total</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr data-estado="{{ booking.estado }}">
+                            <td class="text-muted small">#{{ booking.id }}</td>
+                            {% if is_admin %}
+                            <td>
+                                <div class="fw-semibold">{{ booking.user.nombreCompleto }}</div>
+                                <small class="text-muted">{{ booking.user.email }}</small>
+                            </td>
+                            {% endif %}
+                            <td>
+                                <strong>{{ booking.resource.nombre }}</strong>
+                                {% if booking.resource.category %}
+                                    <br><small class="text-muted">
+                                        <span class="dot me-1" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{{ booking.resource.category.color }}"></span>
+                                        {{ booking.resource.category.nombre }}
+                                    </small>
+                                {% endif %}
+                            </td>
+                            <td>{{ booking.fechaInicio|date('d/m/Y') }}<br><small class="text-muted">{{ booking.fechaInicio|date('H:i') }}</small></td>
+                            <td>{{ booking.fechaFin|date('d/m/Y') }}<br><small class="text-muted">{{ booking.fechaFin|date('H:i') }}</small></td>
+                            <td><span class="badge bg-light text-dark">{{ booking.duracionHoras }}h</span></td>
+                            <td><i class="bi bi-people me-1 text-muted"></i>{{ booking.asistentes }}</td>
+                            <td>
+                                <span class="badge badge-{{ booking.estado }}">
+                                    {% if booking.estado == 'pendiente' %}<i class="bi bi-hourglass-split me-1"></i>{% endif %}
+                                    {% if booking.estado == 'confirmada' %}<i class="bi bi-check2 me-1"></i>{% endif %}
+                                    {% if booking.estado == 'cancelada' %}<i class="bi bi-x me-1"></i>{% endif %}
+                                    {{ booking.estado|capitalize }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if booking.precioTotal %}
+                                    <strong>{{ booking.precioTotal }}€</strong>
+                                {% else %}—{% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex gap-1 justify-content-end">
+                                    <a href="{{ path('app_booking_show', {id: booking.id}) }}"
+                                       class="btn btn-sm btn-outline-primary" title="Ver detalle">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if booking.estado != 'cancelada' %}
+                                    <a href="{{ path('app_booking_edit', {id: booking.id}) }}"
+                                       class="btn btn-sm btn-outline-secondary" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="post" action="{{ path('app_booking_cancel', {id: booking.id}) }}"
+                                          class="d-inline"
+                                          onsubmit="return confirm('¿Cancelar esta reserva?')">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ booking.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-warning" title="Cancelar">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                    {% if is_admin %}
+                                    <form method="post" action="{{ path('app_booking_delete', {id: booking.id}) }}"
+                                          class="d-inline"
+                                          onsubmit="return confirm('¿Eliminar permanentemente esta reserva?')">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ booking.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

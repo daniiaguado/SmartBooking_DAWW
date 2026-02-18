@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nueva Reserva{% endblock %}
+{% block page_title %}<i class="bi bi-plus-circle me-2 text-primary"></i>Nueva Reserva{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="sb-card">
+            <div class="card-body p-4">
+
+                <app-form-validator form-id="bookingForm"></app-form-validator>
+
+                {{ form_start(form, {'attr': {'id': 'bookingForm', 'novalidate': 'novalidate'}}) }}
+
+                <div class="mb-4">
+                    {{ form_label(form.resource) }}
+                    {{ form_widget(form.resource) }}
+                    {{ form_errors(form.resource) }}
+                    <div class="form-text">
+                        <i class="bi bi-info-circle me-1"></i>
+                        El precio total se calculará automáticamente según la duración.
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        {{ form_label(form.fechaInicio) }}
+                        {{ form_widget(form.fechaInicio) }}
+                        {{ form_errors(form.fechaInicio) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_label(form.fechaFin) }}
+                        {{ form_widget(form.fechaFin) }}
+                        {{ form_errors(form.fechaFin) }}
+                    </div>
+                </div>
+
+                {# Preview precio (calculado por Angular) #}
+                <div class="alert alert-info d-none" id="pricePreview">
+                    <i class="bi bi-calculator me-2"></i>
+                    Duración estimada: <strong id="durationPreview">—</strong> |
+                    Precio estimado: <strong id="pricePreviewValue">—</strong>
+                </div>
+
+                <div class="mb-4">
+                    {{ form_label(form.asistentes) }}
+                    {{ form_widget(form.asistentes) }}
+                    {{ form_errors(form.asistentes) }}
+                </div>
+
+                <div class="mb-4">
+                    {{ form_label(form.motivo) }}
+                    {{ form_widget(form.motivo) }}
+                    {{ form_errors(form.motivo) }}
+                </div>
+
+                {% if form.estado is defined %}
+                <div class="mb-4">
+                    {{ form_label(form.estado) }}
+                    {{ form_widget(form.estado) }}
+                </div>
+                {% endif %}
+
+                <div class="d-flex gap-2 justify-content-end">
+                    <a href="{{ path('app_booking_index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-check-lg me-1"></i>Crear Reserva
+                    </button>
+                </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const resourceSel = document.querySelector('[name$="[resource]"]');
+    const fechaInicio  = document.querySelector('[name$="[fechaInicio]"]');
+    const fechaFin     = document.querySelector('[name$="[fechaFin]"]');
+    const preview      = document.getElementById('pricePreview');
+
+    // Resource prices from data attributes or hardcoded for demo
+    const updatePreview = () => {
+        if (!fechaInicio.value || !fechaFin.value) return;
+        const diff = (new Date(fechaFin.value) - new Date(fechaInicio.value)) / 3600000;
+        if (diff <= 0) { preview.classList.add('d-none'); return; }
+        preview.classList.remove('d-none');
+        document.getElementById('durationPreview').textContent = diff.toFixed(1) + 'h';
+        document.getElementById('pricePreviewValue').textContent = '(depende del recurso)';
+    };
+
+    fechaInicio?.addEventListener('change', updatePreview);
+    fechaFin?.addEventListener('change', updatePreview);
+});
+</script>
+{% endblock %}

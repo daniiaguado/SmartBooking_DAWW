@@ -1,0 +1,9 @@
+node_modules/
+symfony/vendor/
+symfony/var/
+symfony/public/build/*.js
+symfony/public/build/*.css
+symfony/public/build/*.map
+angular/node_modules/
+angular/dist/
+.env.local

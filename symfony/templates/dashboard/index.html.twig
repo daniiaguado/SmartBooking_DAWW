@@ -1,0 +1,148 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}<i class="bi bi-grid-1x2-fill me-2 text-primary"></i>Dashboard{% endblock %}
+
+{% block body %}
+
+{# KPI Cards #}
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="sb-card p-3 d-flex align-items-center gap-3">
+            <div class="rounded-3 d-flex align-items-center justify-content-center text-white bg-warning"
+                 style="width:50px;height:50px;font-size:1.4rem">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+            <div>
+                <div class="fs-3 fw-bold">{{ stats.pendiente }}</div>
+                <div class="text-muted small">Pendientes</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="sb-card p-3 d-flex align-items-center gap-3">
+            <div class="rounded-3 d-flex align-items-center justify-content-center text-white bg-success"
+                 style="width:50px;height:50px;font-size:1.4rem">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <div>
+                <div class="fs-3 fw-bold">{{ stats.confirmada }}</div>
+                <div class="text-muted small">Confirmadas</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="sb-card p-3 d-flex align-items-center gap-3">
+            <div class="rounded-3 d-flex align-items-center justify-content-center text-white bg-danger"
+                 style="width:50px;height:50px;font-size:1.4rem">
+                <i class="bi bi-x-circle-fill"></i>
+            </div>
+            <div>
+                <div class="fs-3 fw-bold">{{ stats.cancelada }}</div>
+                <div class="text-muted small">Canceladas</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="sb-card p-3 d-flex align-items-center gap-3">
+            <div class="rounded-3 d-flex align-items-center justify-content-center text-white bg-primary"
+                 style="width:50px;height:50px;font-size:1.4rem">
+                <i class="bi bi-building"></i>
+            </div>
+            <div>
+                <div class="fs-3 fw-bold">{{ total_recursos }}</div>
+                <div class="text-muted small">Recursos activos</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Quick actions #}
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="sb-card p-4 h-100 d-flex align-items-center justify-content-between">
+            <div>
+                <h5 class="fw-bold mb-1">Nueva Reserva</h5>
+                <p class="text-muted small mb-0">Reserva un espacio o equipo ahora</p>
+            </div>
+            <a href="{{ path('app_booking_new') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>Reservar
+            </a>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="sb-card p-4 h-100 d-flex align-items-center justify-content-between">
+            <div>
+                <h5 class="fw-bold mb-1">Ver Recursos</h5>
+                <p class="text-muted small mb-0">Explora los espacios disponibles</p>
+            </div>
+            <a href="{{ path('app_resource_index') }}" class="btn btn-outline-primary">
+                <i class="bi bi-eye me-1"></i>Ver todos
+            </a>
+        </div>
+    </div>
+</div>
+
+{# Recent bookings #}
+<div class="sb-card">
+    <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4 d-flex align-items-center justify-content-between">
+        <h5 class="fw-bold mb-0"><i class="bi bi-clock-history me-2 text-primary"></i>Mis últimas reservas</h5>
+        <a href="{{ path('app_booking_index') }}" class="btn btn-sm btn-outline-secondary">Ver todas</a>
+    </div>
+    <div class="card-body px-4">
+        {% if mis_reservas is empty %}
+            <div class="text-center py-5">
+                <i class="bi bi-calendar-x display-4 text-muted"></i>
+                <p class="text-muted mt-3">Aún no tienes reservas.</p>
+                <a href="{{ path('app_booking_new') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i>Hacer mi primera reserva
+                </a>
+            </div>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Recurso</th>
+                            <th>Inicio</th>
+                            <th>Fin</th>
+                            <th>Asistentes</th>
+                            <th>Estado</th>
+                            <th>Precio</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in mis_reservas|slice(0, 5) %}
+                        <tr>
+                            <td>
+                                <strong>{{ booking.resource.nombre }}</strong>
+                                {% if booking.resource.category %}
+                                    <br><small class="text-muted">{{ booking.resource.category.nombre }}</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ booking.fechaInicio|date('d/m/Y H:i') }}</td>
+                            <td>{{ booking.fechaFin|date('d/m/Y H:i') }}</td>
+                            <td><i class="bi bi-people me-1"></i>{{ booking.asistentes }}</td>
+                            <td>
+                                <span class="badge badge-{{ booking.estado }}">
+                                    {{ booking.estado|capitalize }}
+                                </span>
+                            </td>
+                            <td>{% if booking.precioTotal %}{{ booking.precioTotal }}€{% else %}—{% endif %}</td>
+                            <td>
+                                <a href="{{ path('app_booking_show', {id: booking.id}) }}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

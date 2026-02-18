@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ resource.nombre }}{% endblock %}
+{% block page_title %}<i class="bi bi-building me-2 text-primary"></i>{{ resource.nombre }}{% endblock %}
+
+{% block body %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="sb-card">
+            <div class="card-header bg-transparent border-0 px-4 pt-4 pb-0 d-flex justify-content-between">
+                <h5 class="fw-bold">Detalles del Recurso</h5>
+                {% if resource.isActive %}
+                    <span class="badge bg-success">Activo</span>
+                {% else %}
+                    <span class="badge bg-secondary">Inactivo</span>
+                {% endif %}
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">Nombre</label>
+                        <strong class="fs-5">{{ resource.nombre }}</strong>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">Categoría</label>
+                        {% if resource.category %}
+                            <span class="badge fs-6" style="background:{{ resource.category.color }}20;color:{{ resource.category.color }}">
+                                {{ resource.category.nombre }}
+                            </span>
+                        {% else %}
+                            <span class="text-muted">Sin categoría</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">Capacidad</label>
+                        <span><i class="bi bi-people me-1"></i>{{ resource.capacidad }} personas</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">Ubicación</label>
+                        <span><i class="bi bi-geo-alt me-1"></i>{{ resource.ubicacion ?? 'No especificada' }}</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">Precio por hora</label>
+                        <span class="fs-4 fw-bold text-primary">{{ resource.precioHora }}€/h</span>
+                    </div>
+                    {% if resource.descripcion %}
+                    <div class="col-12">
+                        <label class="text-muted small d-block">Descripción</label>
+                        <p>{{ resource.descripcion }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="sb-card">
+            <div class="card-body p-4">
+                <h6 class="fw-bold text-muted text-uppercase small mb-3">Acciones</h6>
+                <div class="d-grid gap-2">
+                    <a href="{{ path('app_booking_new') }}" class="btn btn-primary">
+                        <i class="bi bi-calendar-plus me-1"></i>Reservar este recurso
+                    </a>
+                    <a href="{{ path('app_resource_index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Volver al listado
+                    </a>
+                    {% if is_granted('ROLE_ADMIN') %}
+                    <hr>
+                    <a href="{{ path('app_resource_edit', {id: resource.id}) }}" class="btn btn-outline-primary">
+                        <i class="bi bi-pencil me-1"></i>Editar
+                    </a>
+                    <form method="post" action="{{ path('app_resource_delete', {id: resource.id}) }}"
+                          onsubmit="return confirm('¿Desactivar este recurso?')">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ resource.id) }}">
+                        <button type="submit" class="btn btn-outline-danger w-100">
+                            <i class="bi bi-eye-slash me-1"></i>Desactivar
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
