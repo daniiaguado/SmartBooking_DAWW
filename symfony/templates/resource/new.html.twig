@@ -13,7 +13,7 @@
                 {{ form_start(form, {'attr': {'id': 'resourceForm', 'novalidate': 'novalidate'}}) }}
 
                 <div class="mb-3">
-                    {{ form_label(form.nombre) }}
+                    {{ form_label(form.nombre, 'Nombre del recurso <span class="text-danger">*</span>', {'label_html': true}) }}
                     {{ form_widget(form.nombre) }}
                     {{ form_errors(form.nombre) }}
                 </div>
@@ -29,7 +29,7 @@
                 </div>
                 <div class="row g-3 mb-3">
                     <div class="col-sm-6">
-                        {{ form_label(form.capacidad) }}
+                        {{ form_label(form.capacidad, 'Capacidad (personas) <span class="text-danger">*</span>', {'label_html': true}) }}
                         {{ form_widget(form.capacidad) }}
                         {{ form_errors(form.capacidad) }}
                     </div>
@@ -40,7 +40,7 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    {{ form_label(form.precioHora) }}
+                    {{ form_label(form.precioHora, 'Precio por hora (€) <span class="text-danger">*</span>', {'label_html': true}) }}
                     {{ form_widget(form.precioHora) }}
                     {{ form_errors(form.precioHora) }}
                 </div>
@@ -48,6 +48,8 @@
                     {{ form_widget(form.isActive) }}
                     {{ form_label(form.isActive) }}
                 </div>
+
+                <p class="text-muted small mb-3"><span class="text-danger">*</span> Campos obligatorios</p>
 
                 <div class="d-flex gap-2 justify-content-end">
                     <a href="{{ path('app_resource_index') }}" class="btn btn-outline-secondary">

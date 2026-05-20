@@ -1,0 +1,91 @@
+<div class="d-flex align-items-center gap-2 mb-4">
+  <a routerLink="/app/bookings" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i>
+  </a>
+  <div>
+    <h4 class="fw-bold mb-0">{{ isEdit ? 'Editar reserva' : 'Nueva reserva' }}</h4>
+    <p class="text-muted mb-0 small">{{ isEdit ? 'Modifica los datos de la reserva' : 'Rellena el formulario para crear una reserva' }}</p>
+  </div>
+</div>
+
+<div *ngIf="loading" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status"></div>
+</div>
+
+<div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+<!-- Card empresa preseleccionada -->
+<div *ngIf="empresaSeleccionada && !isEdit"
+     class="alert d-flex align-items-center gap-3 mb-3"
+     style="background:rgba(14,165,233,.12);border:1px solid rgba(14,165,233,.3);border-radius:.75rem;max-width:640px">
+  <div class="sb-user-avatar flex-shrink-0"
+       style="width:40px;height:40px;font-size:1rem;min-width:40px">
+    {{ empresaSeleccionada.nombreEmpresa.charAt(0).toUpperCase() }}
+  </div>
+  <div>
+    <div style="font-size:.78rem;color:#7dd3fc;font-weight:600;text-transform:uppercase;letter-spacing:.05em">
+      <i class="bi bi-building me-1"></i>Haciendo reserva para
+    </div>
+    <div class="fw-bold" style="color:#e2e8f0">{{ empresaSeleccionada.nombreEmpresa }}</div>
+    <div style="font-size:.78rem;color:#94a3b8">
+      <span *ngIf="empresaSeleccionada.sector">{{ empresaSeleccionada.sector }} · </span>
+      {{ empresaSeleccionada.cif }}
+    </div>
+  </div>
+</div>
+
+<form (ngSubmit)="submit()" *ngIf="!loading" class="sb-card p-4" style="max-width:640px">
+  <div class="mb-3">
+    <label class="form-label fw-semibold">Recurso <span class="text-danger">*</span></label>
+    <select class="form-select" [(ngModel)]="form.resourceId" name="resourceId" required>
+      <option value="0" disabled>-- Selecciona un recurso --</option>
+      <option *ngFor="let r of resources" [value]="r.id">
+        {{ r.nombre }} (Cap. {{ r.capacidad }} · {{ r.precioHora }}€/h)
+      </option>
+    </select>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-sm-6">
+      <label class="form-label fw-semibold">Fecha inicio <span class="text-danger">*</span></label>
+      <input type="datetime-local" class="form-control"
+             [(ngModel)]="form.fechaInicio" name="fechaInicio" required>
+    </div>
+    <div class="col-sm-6">
+      <label class="form-label fw-semibold">Fecha fin <span class="text-danger">*</span></label>
+      <input type="datetime-local" class="form-control"
+             [(ngModel)]="form.fechaFin" name="fechaFin" required>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label fw-semibold">Número de asistentes</label>
+    <input type="number" class="form-control" [(ngModel)]="form.asistentes" name="asistentes" min="1">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label fw-semibold">Motivo / descripción</label>
+    <textarea class="form-control" [(ngModel)]="form.motivo" name="motivo" rows="3"></textarea>
+  </div>
+
+  <div class="mb-3" *ngIf="auth.isAdmin">
+    <label class="form-label fw-semibold">Nombre del cliente</label>
+    <input type="text" class="form-control" [(ngModel)]="form.clienteNombre" name="clienteNombre">
+  </div>
+
+  <div class="mb-4" *ngIf="auth.isAdmin">
+    <label class="form-label fw-semibold">Estado</label>
+    <select class="form-select" [(ngModel)]="form.estado" name="estado">
+      <option *ngFor="let e of estados" [value]="e">{{ e | titlecase }}</option>
+    </select>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary" [disabled]="saving">
+      <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+      <i *ngIf="!saving" class="bi bi-check-lg me-1"></i>
+      {{ isEdit ? 'Guardar cambios' : 'Crear reserva' }}
+    </button>
+    <a routerLink="/app/bookings" class="btn btn-outline-secondary">Cancelar</a>
+  </div>
+</form>

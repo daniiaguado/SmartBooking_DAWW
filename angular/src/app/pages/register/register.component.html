@@ -1,0 +1,397 @@
+<div class="auth-split-wrapper">
+
+  <!-- ── PANEL IZQUIERDO (solo desktop) ───────────────────────────────── -->
+  <div class="col-lg-6 d-none d-lg-flex login-left-panel">
+    <div style="position:relative;z-index:1;width:100%">
+
+      <div class="d-flex align-items-center gap-3 mb-5">
+        <div style="width:48px;height:48px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(99,102,241,.5);">
+          <i class="bi bi-calendar-check text-white" style="font-size:1.5rem"></i>
+        </div>
+        <div>
+          <div style="font-size:1.25rem;font-weight:800;color:#fff;letter-spacing:-.02em">SmartBooking</div>
+          <div style="font-size:0.72rem;color:#94a3b8;font-weight:500;letter-spacing:.04em;text-transform:uppercase">Sistema de Reservas</div>
+        </div>
+      </div>
+
+      <h2 style="font-size:2rem;font-weight:700;color:#fff;letter-spacing:-.03em;line-height:1.25;margin-bottom:.85rem">
+        Únete a SmartBooking<br>
+        <span style="background:linear-gradient(90deg,#a5b4fc,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">
+          y gestiona con eficiencia
+        </span>
+      </h2>
+      <p style="color:#94a3b8;font-size:.9rem;margin-bottom:2.25rem;line-height:1.7;max-width:360px">
+        Crea tu cuenta gratuita y empieza a gestionar reservas,
+        espacios y recursos en tiempo real.
+      </p>
+
+      <div class="d-flex flex-column gap-3 mb-4">
+        <div class="d-flex align-items-center gap-3">
+          <div class="login-feature-icon"><i class="bi bi-person-check"></i></div>
+          <span style="color:#e2e8f0;font-size:.9rem;font-weight:500">Registro en segundos</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <div class="login-feature-icon"><i class="bi bi-shield-check"></i></div>
+          <span style="color:#e2e8f0;font-size:.9rem;font-weight:500">Datos protegidos y seguros</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <div class="login-feature-icon"><i class="bi bi-building"></i></div>
+          <span style="color:#e2e8f0;font-size:.9rem;font-weight:500">Para personas y empresas</span>
+        </div>
+      </div>
+
+      <div class="login-quote-card mt-4">
+        <p style="color:#cbd5e1;font-style:italic;font-size:.875rem;line-height:1.65;margin-bottom:.85rem">
+          "En menos de un minuto tuve mi cuenta configurada. SmartBooking es increíblemente sencillo."
+        </p>
+        <div class="d-flex align-items-center gap-2">
+          <div style="width:32px;height:32px;background:linear-gradient(135deg,#6366f1,#818cf8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:#fff;flex-shrink:0">JM</div>
+          <div>
+            <div style="color:#e2e8f0;font-size:.8rem;font-weight:600">Javier Martínez</div>
+            <div style="color:#64748b;font-size:.72rem">Director de Operaciones · TechSoluciones</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:2.5rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,.07)">
+        <p style="color:#475569;font-size:.75rem;margin:0">
+          &copy; {{ currentYear }} SmartBooking · Todos los derechos reservados
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── PANEL DERECHO – formulario ──────────────────────────────────── -->
+  <div class="col-12 col-lg-6 auth-right-panel" style="overflow-y:auto">
+    <div style="width:100%;max-width:480px">
+
+      <!-- Logo (solo móvil) -->
+      <div class="d-flex d-lg-none align-items-center justify-content-center gap-2 mb-5">
+        <div style="width:40px;height:40px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(99,102,241,.4);">
+          <i class="bi bi-calendar-check text-white" style="font-size:1.2rem"></i>
+        </div>
+        <span style="font-size:1.25rem;font-weight:800;color:#0f172a;letter-spacing:-.02em">SmartBooking</span>
+      </div>
+
+      <!-- Encabezado -->
+      <div class="mb-4">
+        <h1 style="font-size:1.75rem;font-weight:800;color:#0f172a;letter-spacing:-.03em;margin-bottom:.4rem">
+          Crear cuenta
+        </h1>
+        <p style="color:#64748b;font-size:.9rem;margin:0">Rellena los datos para registrarte</p>
+      </div>
+
+      <!-- Error global -->
+      <div *ngIf="errorMessage" class="alert alert-danger d-flex align-items-center gap-2 mb-4">
+        <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+
+        <!-- ── SELECTOR TIPO ─────────────────────────────────────────── -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Tipo de cuenta</label>
+          <div class="row g-2">
+
+            <div class="col-6">
+              <div class="user-type-card"
+                   [class.active]="userType === 'persona'"
+                   (click)="selectType('persona')"
+                   (keydown.enter)="selectType('persona')"
+                   (keydown.space)="selectType('persona')"
+                   role="button" tabindex="0">
+                <i class="bi bi-person-fill fs-2 mb-1" [style.color]="userType==='persona' ? 'var(--primary)' : '#94a3b8'"></i>
+                <div class="fw-semibold" style="font-size:.9rem">Persona</div>
+                <small class="text-muted" style="font-size:.75rem">Cuenta personal</small>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <div class="user-type-card"
+                   [class.active]="userType === 'empresa'"
+                   (click)="selectType('empresa')"
+                   (keydown.enter)="selectType('empresa')"
+                   (keydown.space)="selectType('empresa')"
+                   role="button" tabindex="0">
+                <i class="bi bi-building fs-2 mb-1" [style.color]="userType==='empresa' ? 'var(--primary)' : '#94a3b8'"></i>
+                <div class="fw-semibold" style="font-size:.9rem">Empresa</div>
+                <small class="text-muted" style="font-size:.75rem">Cuenta empresarial</small>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── EMAIL ─────────────────────────────────────────────────── -->
+        <div class="mb-3">
+          <label for="reg-email" class="form-label">Correo electrónico</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+            <input type="email"
+                   id="reg-email"
+                   formControlName="email"
+                   class="form-control"
+                   [class.is-invalid]="ctrl('email').invalid && ctrl('email').touched"
+                   autocomplete="email"
+                   placeholder="tu@email.com">
+            <div class="invalid-feedback">
+              <span *ngIf="ctrl('email').errors?.['required']">El email es obligatorio.</span>
+              <span *ngIf="ctrl('email').errors?.['email']">Introduce un email válido.</span>
+              <span *ngIf="ctrl('email').errors?.['emailTaken']">Ya existe una cuenta con este email.</span>
+              <span *ngIf="ctrl('email').errors?.['apiError']">{{ ctrl('email').errors?.['apiError'] }}</span>
+            </div>
+          </div>
+          <div *ngIf="ctrl('email').pending" class="form-text text-muted small mt-1">
+            <span class="spinner-border spinner-border-sm me-1" style="width:.75rem;height:.75rem"></span>Verificando disponibilidad…
+          </div>
+        </div>
+
+        <!-- ── CAMPOS PERSONA ────────────────────────────────────────── -->
+        <div *ngIf="userType === 'persona'">
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label for="reg-nombre" class="form-label">Nombre</label>
+              <input type="text"
+                     id="reg-nombre"
+                     formControlName="nombre"
+                     class="form-control"
+                     [class.is-invalid]="ctrl('nombre').invalid && ctrl('nombre').touched"
+                     placeholder="Tu nombre">
+              <div class="invalid-feedback">
+                <span *ngIf="ctrl('nombre').errors?.['required']">El nombre es obligatorio.</span>
+              </div>
+            </div>
+            <div class="col-6">
+              <label for="reg-apellidos" class="form-label">Apellidos</label>
+              <input type="text"
+                     id="reg-apellidos"
+                     formControlName="apellidos"
+                     class="form-control"
+                     [class.is-invalid]="ctrl('apellidos').invalid && ctrl('apellidos').touched"
+                     placeholder="Tus apellidos">
+              <div class="invalid-feedback">
+                <span *ngIf="ctrl('apellidos').errors?.['required']">Los apellidos son obligatorios.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label for="reg-dni" class="form-label">DNI</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                <input type="text"
+                       id="reg-dni"
+                       formControlName="dni"
+                       class="form-control"
+                       [class.is-invalid]="ctrl('dni').invalid && ctrl('dni').touched"
+                       placeholder="12345678A">
+                <div class="invalid-feedback">
+                  <span *ngIf="ctrl('dni').errors?.['required']">El DNI es obligatorio.</span>
+                  <span *ngIf="ctrl('dni').errors?.['pattern']">Formato: 8 dígitos + letra.</span>
+                  <span *ngIf="ctrl('dni').errors?.['apiError']">{{ ctrl('dni').errors?.['apiError'] }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <label for="reg-telefono" class="form-label">Teléfono <span class="text-muted">(opcional)</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                <input type="tel"
+                       id="reg-telefono"
+                       formControlName="telefono"
+                       class="form-control"
+                       placeholder="+34 600 000 000">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── CAMPOS EMPRESA ────────────────────────────────────────── -->
+        <div *ngIf="userType === 'empresa'">
+          <div class="mb-3">
+            <label for="reg-nombreEmpresa" class="form-label">Nombre de la empresa</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-building"></i></span>
+              <input type="text"
+                     id="reg-nombreEmpresa"
+                     formControlName="nombreEmpresa"
+                     class="form-control"
+                     [class.is-invalid]="ctrl('nombreEmpresa').invalid && ctrl('nombreEmpresa').touched"
+                     placeholder="Nombre comercial">
+              <div class="invalid-feedback">
+                <span *ngIf="ctrl('nombreEmpresa').errors?.['required']">El nombre de empresa es obligatorio.</span>
+                <span *ngIf="ctrl('nombreEmpresa').errors?.['apiError']">{{ ctrl('nombreEmpresa').errors?.['apiError'] }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label for="reg-cif" class="form-label">CIF</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                <input type="text"
+                       id="reg-cif"
+                       formControlName="cif"
+                       class="form-control"
+                       [class.is-invalid]="ctrl('cif').invalid && ctrl('cif').touched"
+                       placeholder="B12345678">
+                <div class="invalid-feedback">
+                  <span *ngIf="ctrl('cif').errors?.['required']">El CIF es obligatorio.</span>
+                  <span *ngIf="ctrl('cif').errors?.['apiError']">{{ ctrl('cif').errors?.['apiError'] }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <label for="reg-sector" class="form-label">Sector <span class="text-muted">(opcional)</span></label>
+              <input type="text"
+                     id="reg-sector"
+                     formControlName="sector"
+                     class="form-control"
+                     placeholder="Tecnología, Hostelería…">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="reg-telefonoEmpresa" class="form-label">Teléfono empresa <span class="text-muted">(opcional)</span></label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
+              <input type="tel"
+                     id="reg-telefonoEmpresa"
+                     formControlName="telefonoEmpresa"
+                     class="form-control"
+                     placeholder="+34 900 000 000">
+            </div>
+          </div>
+        </div>
+
+        <!-- ── CONTRASEÑA ────────────────────────────────────────────── -->
+        <div class="mb-3">
+          <label for="reg-password" class="form-label">Contraseña</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+            <input [type]="showPassword ? 'text' : 'password'"
+                   id="reg-password"
+                   formControlName="password"
+                   class="form-control"
+                   [class.is-invalid]="ctrl('password').invalid && ctrl('password').touched"
+                   autocomplete="new-password"
+                   placeholder="Mínimo 8 caracteres">
+            <button type="button" class="btn btn-outline-secondary" (click)="togglePassword()" title="Mostrar/ocultar">
+              <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+            </button>
+            <div class="invalid-feedback">
+              <span *ngIf="ctrl('password').errors?.['required']">La contraseña es obligatoria.</span>
+              <span *ngIf="ctrl('password').errors?.['minlength']">Mínimo 8 caracteres.</span>
+            </div>
+          </div>
+          <!-- Indicador de fuerza -->
+          <div *ngIf="ctrl('password').value" class="mt-2">
+            <div class="progress" style="height:5px;border-radius:3px">
+              <div class="progress-bar {{ strengthClass }}"
+                   [ngClass]="strengthClass"
+                   [style.width]="strengthWidth"
+                   style="transition:width .3s ease"></div>
+            </div>
+            <small class="mt-1 d-block fw-semibold"
+                   [ngClass]="{
+                     'text-danger':  passwordStrength === 'weak',
+                     'text-warning': passwordStrength === 'medium',
+                     'text-success': passwordStrength === 'strong'
+                   }">
+              Fortaleza: {{ strengthLabel }}
+            </small>
+          </div>
+        </div>
+
+        <!-- ── CONFIRMAR CONTRASEÑA ───────────────────────────────────── -->
+        <div class="mb-4">
+          <label for="reg-confirm" class="form-label">Confirmar contraseña</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+            <input [type]="showConfirm ? 'text' : 'password'"
+                   id="reg-confirm"
+                   formControlName="confirmPassword"
+                   class="form-control"
+                   [class.is-invalid]="(ctrl('confirmPassword').touched && registerForm.errors?.['passwordMismatch']) || (ctrl('confirmPassword').invalid && ctrl('confirmPassword').touched)"
+                   autocomplete="new-password"
+                   placeholder="Repite la contraseña">
+            <button type="button" class="btn btn-outline-secondary" (click)="toggleConfirm()" title="Mostrar/ocultar">
+              <i [class]="showConfirm ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+            </button>
+            <div class="invalid-feedback">
+              <span *ngIf="ctrl('confirmPassword').errors?.['required']">Confirma tu contraseña.</span>
+              <span *ngIf="registerForm.errors?.['passwordMismatch'] && ctrl('confirmPassword').touched">Las contraseñas no coinciden.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── TÉRMINOS ───────────────────────────────────────────────── -->
+        <div class="mb-4 form-check">
+          <input type="checkbox"
+                 id="reg-terms"
+                 formControlName="agreeTerms"
+                 class="form-check-input"
+                 [class.is-invalid]="ctrl('agreeTerms').invalid && ctrl('agreeTerms').touched">
+          <label class="form-check-label small" for="reg-terms" style="color:#64748b">
+            Acepto los <a href="#" class="fw-semibold text-decoration-none" style="color:var(--primary)">términos y condiciones</a>
+          </label>
+          <div class="invalid-feedback">
+            Debes aceptar los términos para continuar.
+          </div>
+        </div>
+
+        <!-- ── BOTÓN ENVIAR ───────────────────────────────────────────── -->
+        <button type="submit"
+                class="btn btn-auth-primary w-100 mb-4"
+                style="padding:.8rem"
+                [disabled]="loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          <i *ngIf="!loading" class="bi bi-person-plus me-2"></i>
+          {{ loading ? 'Creando cuenta…' : 'Crear cuenta' }}
+        </button>
+
+      </form>
+
+      <div class="d-flex align-items-center mb-4">
+        <hr class="flex-grow-1 m-0" style="border-color:#e2e8f0">
+        <span class="px-3 text-muted small">o</span>
+        <hr class="flex-grow-1 m-0" style="border-color:#e2e8f0">
+      </div>
+
+      <p class="text-center mb-0" style="font-size:.875rem;color:#64748b">
+        ¿Ya tienes cuenta?
+        <a routerLink="/app/login" class="fw-semibold text-decoration-none" style="color:var(--primary)">Inicia sesión</a>
+      </p>
+
+    </div>
+  </div>
+
+</div>
+
+<style>
+  .user-type-card {
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1rem .75rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .user-type-card:hover:not(.active) {
+    border-color: #a5b4fc;
+    background-color: #f8fafc;
+    transform: translateY(-1px);
+  }
+  .user-type-card.active {
+    border-color: var(--primary, #6366f1) !important;
+    background-color: rgba(99,102,241,.06);
+    box-shadow: 0 0 0 3px rgba(99,102,241,.15);
+  }
+</style>

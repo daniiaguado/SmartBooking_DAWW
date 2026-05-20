@@ -1,0 +1,150 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Calendario de Reservas{% endblock %}
+{% block page_title %}<i class="bi bi-calendar3 me-2 text-primary"></i>Calendario de Reservas{% endblock %}
+
+{% block stylesheets %}
+<style>
+    #calendar-wrapper {
+        background: #fff;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        padding: 1.25rem;
+    }
+
+    /* Ajustes FullCalendar para integrarse con el diseño Bootstrap */
+    .fc .fc-toolbar-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    .fc .fc-button {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        font-size: 0.85rem;
+        padding: 0.35rem 0.75rem;
+    }
+    .fc .fc-button:hover,
+    .fc .fc-button:focus {
+        background-color: #0b5ed7;
+        border-color: #0b5ed7;
+        box-shadow: none;
+    }
+    .fc .fc-button-primary:not(:disabled).fc-button-active,
+    .fc .fc-button-primary:not(:disabled):active {
+        background-color: #084298;
+        border-color: #084298;
+    }
+    .fc-event {
+        cursor: pointer;
+        border: none !important;
+        font-size: 0.78rem;
+        padding: 1px 4px;
+    }
+    .fc-event:hover {
+        opacity: 0.85;
+        text-decoration: none;
+    }
+    .fc-daygrid-event-dot { display: none; }
+    .fc-list-event:hover td { background-color: #f8f9fa; }
+
+    /* Leyenda de colores */
+    .calendar-legend .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.85rem;
+        margin-right: 1.25rem;
+    }
+    .calendar-legend .legend-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+{# ── Barra de acciones ─────────────────────────────────────────────────── #}
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+    <div class="calendar-legend">
+        <span class="legend-item">
+            <span class="legend-dot" style="background:#198754"></span> Confirmada
+        </span>
+        <span class="legend-item">
+            <span class="legend-dot" style="background:#fd7e14"></span> Pendiente
+        </span>
+        <span class="legend-item">
+            <span class="legend-dot" style="background:#dc3545"></span> Cancelada
+        </span>
+    </div>
+    <a href="{{ path('app_booking_new') }}" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-circle me-1"></i>Nueva reserva
+    </a>
+</div>
+
+{# ── Calendario ────────────────────────────────────────────────────────── #}
+<div id="calendar-wrapper">
+    <div id="calendar"></div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var calendarEl = document.getElementById('calendar');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'es',
+        initialView: 'dayGridMonth',
+        height: 'auto',
+        headerToolbar: {
+            left:   'prev,next today',
+            center: 'title',
+            right:  'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+        },
+        buttonText: {
+            today:    'Hoy',
+            month:    'Mes',
+            week:     'Semana',
+            day:      'Día',
+            list:     'Lista'
+        },
+        firstDay: 1,
+        nowIndicator: true,
+        navLinks: true,
+        editable: false,
+        dayMaxEvents: 3,
+
+        events: '{{ path('app_calendar_events') }}',
+
+        eventClick: function (info) {
+            info.jsEvent.preventDefault();
+            if (info.event.url) {
+                window.location.href = info.event.url;
+            }
+        },
+
+        eventDidMount: function (info) {
+            var props = info.event.extendedProps;
+            var estadoLabel = props.estado.charAt(0).toUpperCase() + props.estado.slice(1);
+            var tooltip = info.event.title;
+            if (props.motivo) {
+                tooltip += '\nMotivo: ' + props.motivo;
+            }
+            tooltip += '\nEstado: ' + estadoLabel;
+            info.el.setAttribute('title', tooltip);
+        },
+
+        noEventsContent: 'No hay reservas para mostrar',
+        moreLinkText: function (num) { return '+' + num + ' más'; }
+    });
+
+    calendar.render();
+});
+</script>
+{% endblock %}

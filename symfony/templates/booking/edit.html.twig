@@ -24,26 +24,26 @@
                 {{ form_start(form, {'attr': {'id': 'editBookingForm', 'novalidate': 'novalidate'}}) }}
 
                 <div class="mb-4">
-                    {{ form_label(form.resource) }}
+                    {{ form_label(form.resource, 'Recurso <span class="text-danger">*</span>', {'label_html': true}) }}
                     {{ form_widget(form.resource) }}
                     {{ form_errors(form.resource) }}
                 </div>
 
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
-                        {{ form_label(form.fechaInicio) }}
+                        {{ form_label(form.fechaInicio, 'Fecha y hora de inicio <span class="text-danger">*</span>', {'label_html': true}) }}
                         {{ form_widget(form.fechaInicio) }}
                         {{ form_errors(form.fechaInicio) }}
                     </div>
                     <div class="col-md-6">
-                        {{ form_label(form.fechaFin) }}
+                        {{ form_label(form.fechaFin, 'Fecha y hora de fin <span class="text-danger">*</span>', {'label_html': true}) }}
                         {{ form_widget(form.fechaFin) }}
                         {{ form_errors(form.fechaFin) }}
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    {{ form_label(form.asistentes) }}
+                    {{ form_label(form.asistentes, 'Número de asistentes <span class="text-danger">*</span>', {'label_html': true}) }}
                     {{ form_widget(form.asistentes) }}
                     {{ form_errors(form.asistentes) }}
                 </div>
@@ -60,6 +60,8 @@
                     {{ form_widget(form.estado) }}
                 </div>
                 {% endif %}
+
+                <p class="text-muted small mb-3"><span class="text-danger">*</span> Campos obligatorios</p>
 
                 <div class="d-flex gap-2 justify-content-end">
                     <a href="{{ path('app_booking_show', {id: booking.id}) }}" class="btn btn-outline-secondary">

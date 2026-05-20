@@ -1,0 +1,92 @@
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+  <div>
+    <h4 class="fw-bold mb-0"><i class="bi bi-building me-2"></i>Empresas</h4>
+    <p class="text-muted mb-0 small">Busca empresas y gestiona sus reservas</p>
+  </div>
+</div>
+
+<!-- Buscador -->
+<div class="sb-card p-3 mb-4">
+  <div class="input-group">
+    <span class="input-group-text bg-transparent border-end-0">
+      <i class="bi bi-search text-muted"></i>
+    </span>
+    <input
+      type="text"
+      class="form-control border-start-0"
+      placeholder="Buscar empresa por nombre..."
+      [value]="searchQuery"
+      (input)="onSearch($any($event.target).value)"
+    />
+    <button
+      *ngIf="searchQuery"
+      class="btn btn-outline-secondary border-start-0"
+      type="button"
+      (click)="onSearch('')"
+    >
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+</div>
+
+<!-- Spinner -->
+<div *ngIf="loading" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+  <p class="text-muted mt-2 small">Cargando empresas...</p>
+</div>
+
+<!-- Error -->
+<div *ngIf="error && !loading" class="alert alert-danger">
+  <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+</div>
+
+<!-- Estado vacío -->
+<div *ngIf="!loading && !error && empresas.length === 0" class="text-center py-5">
+  <i class="bi bi-building-slash" style="font-size:3rem;color:#94a3b8"></i>
+  <h5 class="mt-3 text-muted">No se encontraron empresas</h5>
+  <p class="text-muted small">Intenta con otro término de búsqueda</p>
+</div>
+
+<!-- Grid de cards -->
+<div *ngIf="!loading && empresas.length > 0" class="row g-3">
+  <div class="col-sm-6 col-lg-4 col-xl-3" *ngFor="let empresa of empresas">
+    <div class="sb-card p-3 h-100 d-flex flex-column">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="sb-user-avatar flex-shrink-0" style="width:48px;height:48px;font-size:1.25rem">
+          {{ getInitial(empresa) }}
+        </div>
+        <div class="overflow-hidden">
+          <div class="fw-semibold text-truncate" title="{{ empresa.nombreEmpresa }}">
+            {{ empresa.nombreEmpresa }}
+          </div>
+          <div class="small text-muted">
+            <i class="bi bi-card-text me-1"></i>{{ empresa.cif || '—' }}
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3 flex-grow-1">
+        <span *ngIf="empresa.sector"
+              class="badge"
+              style="background:rgba(14,165,233,.15);color:#0ea5e9;font-size:.75rem">
+          <i class="bi bi-tag me-1"></i>{{ empresa.sector }}
+        </span>
+        <span *ngIf="!empresa.sector" class="text-muted small">Sin sector definido</span>
+      </div>
+
+      <button
+        class="btn btn-primary btn-sm w-100"
+        (click)="hacerReserva(empresa)"
+      >
+        <i class="bi bi-calendar-plus me-1"></i>Hacer reserva
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Contador -->
+<div *ngIf="!loading && empresas.length > 0" class="mt-3 text-muted small text-end">
+  {{ empresas.length }} empresa{{ empresas.length !== 1 ? 's' : '' }} encontrada{{ empresas.length !== 1 ? 's' : '' }}
+</div>

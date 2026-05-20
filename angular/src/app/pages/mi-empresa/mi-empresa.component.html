@@ -1,0 +1,131 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-0">Mi empresa</h4>
+    <p class="text-muted mb-0 small">Gestión de datos de empresa y reservas recibidas</p>
+  </div>
+</div>
+
+<!-- Formulario datos empresa -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-5">
+    <div class="sb-card p-4 h-100">
+      <h6 class="fw-bold mb-3"><i class="bi bi-building-fill me-2 text-primary"></i>Datos de la empresa</h6>
+
+      <div *ngIf="saveSuccess" class="alert alert-success py-2">
+        <i class="bi bi-check-circle me-2"></i>Datos guardados correctamente.
+      </div>
+      <div *ngIf="saveError" class="alert alert-danger py-2">
+        {{ saveError }}
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="mb-3">
+          <label class="form-label fw-semibold small">Nombre empresa <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" formControlName="nombreEmpresa"
+                 [class.is-invalid]="form.get('nombreEmpresa')?.invalid && form.get('nombreEmpresa')?.touched" />
+          <div class="invalid-feedback">El nombre de empresa es obligatorio.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold small">CIF</label>
+          <input type="text" class="form-control" formControlName="cif" placeholder="B12345678" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold small">Sector</label>
+          <input type="text" class="form-control" formControlName="sector" placeholder="Tecnología, Hostelería..." />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold small">Teléfono</label>
+          <input type="tel" class="form-control" formControlName="telefonoEmpresa" placeholder="6XX XXX XXX" />
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100" [disabled]="saving || form.invalid">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!saving" class="bi bi-floppy me-1"></i>
+          {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="sb-card p-4 h-100">
+      <h6 class="fw-bold mb-3"><i class="bi bi-info-circle me-2 text-muted"></i>Resumen de cuenta</h6>
+      <dl class="row mb-0">
+        <dt class="col-5 text-muted small">Email</dt>
+        <dd class="col-7 small fw-semibold">{{ user?.email }}</dd>
+
+        <dt class="col-5 text-muted small">Nombre empresa</dt>
+        <dd class="col-7 small fw-semibold">{{ user?.nombreEmpresa || '—' }}</dd>
+
+        <dt class="col-5 text-muted small">CIF</dt>
+        <dd class="col-7 small fw-semibold">{{ user?.cif || '—' }}</dd>
+
+        <dt class="col-5 text-muted small">Sector</dt>
+        <dd class="col-7 small fw-semibold">{{ user?.sector || '—' }}</dd>
+
+        <dt class="col-5 text-muted small">Teléfono</dt>
+        <dd class="col-7 small fw-semibold">{{ user?.telefonoEmpresa || '—' }}</dd>
+      </dl>
+    </div>
+  </div>
+</div>
+
+<!-- Reservas recibidas -->
+<div class="sb-card">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 px-4">
+    <h6 class="mb-0 fw-bold"><i class="bi bi-calendar3 me-2 text-primary"></i>Reservas recibidas</h6>
+    <span class="badge bg-primary rounded-pill">{{ bookings.length }}</span>
+  </div>
+  <div class="card-body p-0">
+
+    <div *ngIf="loadingBookings" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+    </div>
+
+    <div *ngIf="loadingError" class="alert alert-warning m-3">{{ loadingError }}</div>
+
+    <div *ngIf="!loadingBookings && bookings.length === 0" class="text-center py-5 text-muted">
+      <i class="bi bi-calendar-x fs-1 opacity-25 d-block mb-2"></i>
+      No hay reservas recibidas para tu empresa
+    </div>
+
+    <div class="table-responsive" *ngIf="!loadingBookings && bookings.length > 0">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Recurso</th>
+            <th>Cliente</th>
+            <th>Fecha inicio</th>
+            <th>Duración</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of bookings">
+            <td>
+              <span class="fw-semibold">{{ b.resource?.nombre }}</span>
+              <div class="text-muted small">{{ b.resource?.ubicacion }}</div>
+            </td>
+            <td class="small">{{ b.user?.displayName || b.clienteNombre || '—' }}</td>
+            <td>{{ b.fechaInicio | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ b.duracionHoras }}h</td>
+            <td>
+              <span class="badge rounded-pill" [ngClass]="estadoBadge(b.estado)">
+                {{ b.estado }}
+              </span>
+            </td>
+            <td>
+              <a [routerLink]="['/app/bookings', b.id]" class="btn btn-sm btn-outline-primary" title="Ver detalle">
+                <i class="bi bi-eye"></i>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,109 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-0">Recursos</h4>
+    <p class="text-muted mb-0 small">Espacios y recursos reservables</p>
+  </div>
+  <button *ngIf="auth.isAdmin" class="btn btn-primary" (click)="openNew()">
+    <i class="bi bi-plus-lg me-1"></i>Nuevo recurso
+  </button>
+</div>
+
+<div *ngIf="successMsg" class="alert alert-success alert-dismissible fade show">
+  <i class="bi bi-check-circle-fill me-2"></i>{{ successMsg }}
+  <button type="button" class="btn-close" (click)="successMsg=''"></button>
+</div>
+<div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+  {{ error }}
+  <button type="button" class="btn-close" (click)="error=''"></button>
+</div>
+
+<!-- Formulario inline -->
+<div class="sb-card p-4 mb-4" *ngIf="showForm">
+  <h6 class="fw-bold mb-3">{{ editingResource ? 'Editar recurso' : 'Nuevo recurso' }}</h6>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label small fw-semibold">Nombre *</label>
+      <input class="form-control" [(ngModel)]="form.nombre" placeholder="Nombre del recurso">
+    </div>
+    <div class="col-md-6">
+      <label class="form-label small fw-semibold">Categoría</label>
+      <select class="form-select" [(ngModel)]="form.categoryId">
+        <option [ngValue]="undefined">Sin categoría</option>
+        <option *ngFor="let c of categories" [value]="c.id">{{ c.nombre }}</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label small fw-semibold">Capacidad</label>
+      <input type="number" class="form-control" [(ngModel)]="form.capacidad" min="1">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label small fw-semibold">Precio/hora (€)</label>
+      <input type="number" class="form-control" [(ngModel)]="form.precioHora" min="0" step="0.01">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label small fw-semibold">Ubicación</label>
+      <input class="form-control" [(ngModel)]="form.ubicacion" placeholder="Planta 1, Sala A…">
+    </div>
+    <div class="col-12">
+      <label class="form-label small fw-semibold">Descripción</label>
+      <textarea class="form-control" [(ngModel)]="form.descripcion" rows="2"></textarea>
+    </div>
+    <div class="col-12">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" [(ngModel)]="form.isActive" id="isActive">
+        <label class="form-check-label" for="isActive">Activo</label>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex gap-2 mt-3">
+    <button class="btn btn-primary btn-sm" (click)="save()">
+      <i class="bi bi-check-lg me-1"></i>Guardar
+    </button>
+    <button class="btn btn-outline-secondary btn-sm" (click)="showForm=false">Cancelar</button>
+  </div>
+</div>
+
+<!-- Tarjetas -->
+<div *ngIf="loading" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status"></div>
+</div>
+
+<div *ngIf="!loading && resources.length === 0" class="text-center py-5 text-muted">
+  <i class="bi bi-building-slash fs-1 opacity-25 d-block mb-2"></i>
+  No hay recursos disponibles
+</div>
+
+<div class="row g-3" *ngIf="!loading && resources.length > 0">
+  <div class="col-md-6 col-lg-4" *ngFor="let r of resources">
+    <div class="sb-card p-4 h-100">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <h6 class="fw-bold mb-0">{{ r.nombre }}</h6>
+          <div class="text-muted small">{{ r.ubicacion }}</div>
+        </div>
+        <span *ngIf="r.category" class="badge rounded-pill text-white small"
+              [style.background]="r.category.color">{{ r.category.nombre }}</span>
+      </div>
+      <p class="text-muted small mb-3" *ngIf="r.descripcion">{{ r.descripcion }}</p>
+      <div class="d-flex flex-wrap gap-3 text-muted small mb-3">
+        <span><i class="bi bi-people me-1"></i>Capacidad: {{ r.capacidad }}</span>
+        <span><i class="bi bi-currency-euro me-1"></i>{{ r.precioHora }}€/h</span>
+        <span>
+          <i class="bi me-1" [ngClass]="r.isActive ? 'bi-circle-fill text-success' : 'bi-circle-fill text-danger'"></i>
+          {{ r.isActive ? 'Activo' : 'Inactivo' }}
+        </span>
+      </div>
+      <div class="d-flex gap-2" *ngIf="auth.isAdmin">
+        <button class="btn btn-sm btn-outline-secondary flex-fill" (click)="openEdit(r)">
+          <i class="bi bi-pencil me-1"></i>Editar
+        </button>
+        <button class="btn btn-sm btn-outline-danger" (click)="delete(r)">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+      <a *ngIf="!auth.isAdmin" routerLink="/app/bookings/new" class="btn btn-sm btn-outline-primary w-100">
+        <i class="bi bi-calendar-plus me-1"></i>Reservar
+      </a>
+    </div>
+  </div>
+</div>

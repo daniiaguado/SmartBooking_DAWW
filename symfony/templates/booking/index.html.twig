@@ -132,6 +132,16 @@
                                        class="btn btn-sm btn-outline-secondary" title="Editar">
                                         <i class="bi bi-pencil"></i>
                                     </a>
+                                    {% if booking.estado != 'confirmada' and is_admin %}
+                                    <form method="post" action="{{ path('app_booking_confirmar', {id: booking.id}) }}"
+                                          class="d-inline"
+                                          onsubmit="return confirm('¿Confirmar esta reserva?')">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('confirmar' ~ booking.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-success" title="Confirmar">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
                                     <form method="post" action="{{ path('app_booking_cancel', {id: booking.id}) }}"
                                           class="d-inline"
                                           onsubmit="return confirm('¿Cancelar esta reserva?')">

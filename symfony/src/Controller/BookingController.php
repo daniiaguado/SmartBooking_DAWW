@@ -6,6 +6,7 @@ use App\Entity\Booking;
 use App\Form\BookingType;
 use App\Repository\BookingRepository;
 use App\Repository\ResourceRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,25 +42,60 @@ class BookingController extends AbstractController
     }
 
     #[Route('/new', name: 'app_booking_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em, BookingRepository $repo): Response
+    public function new(Request $request, EntityManagerInterface $em, BookingRepository $repo, UserRepository $userRepo): Response
     {
         $booking = new Booking();
-        $form    = $this->createForm(BookingType::class, $booking, [
-            'is_admin' => $this->isGranted('ROLE_ADMIN'),
+
+        // Empresa preseleccionada vía ?empresa=ID
+        $empresaId = $request->query->getInt('empresa') ?: null;
+        $empresa   = null;
+        if ($empresaId) {
+            $empresa = $userRepo->find($empresaId);
+            if (!$empresa || !$empresa->isEmpresa()) {
+                $empresa   = null;
+                $empresaId = null;
+            }
+        }
+
+        $form = $this->createForm(BookingType::class, $booking, [
+            'is_admin'   => $this->isGranted('ROLE_ADMIN'),
+            'empresa_id' => $empresaId,
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($repo->hasConflict(
-                $booking->getResource()->getId(),
+            $conflicts = $repo->findConflictingBookings(
+                $booking->getResource(),
                 $booking->getFechaInicio(),
                 $booking->getFechaFin()
-            )) {
-                $this->addFlash('danger', 'El recurso ya está reservado en ese horario. Elige otro horario o recurso.');
-                return $this->render('booking/new.html.twig', ['form' => $form]);
+            );
+
+            if (!empty($conflicts)) {
+                $detalles = implode('; ', array_map(
+                    fn(Booking $c) => sprintf(
+                        'del %s al %s',
+                        $c->getFechaInicio()->format('d/m/Y H:i'),
+                        $c->getFechaFin()->format('d/m/Y H:i')
+                    ),
+                    $conflicts
+                ));
+                $this->addFlash('danger', sprintf(
+                    'El recurso ya está reservado en ese horario (%s). Por favor, elige otro horario o recurso.',
+                    $detalles
+                ));
+                return $this->render('booking/new.html.twig', ['form' => $form, 'empresa' => $empresa]);
             }
 
             $booking->setUser($this->getUser());
+
+            // Si la reserva es para una empresa concreta, guardar su nombre
+            $submittedEmpresaId = (int) $form->get('empresaId')->getData();
+            if ($submittedEmpresaId) {
+                $empresaObj = $userRepo->find($submittedEmpresaId);
+                if ($empresaObj && $empresaObj->isEmpresa()) {
+                    $booking->setClienteNombre($empresaObj->getNombreEmpresa());
+                }
+            }
 
             if (!$this->isGranted('ROLE_ADMIN')) {
                 $booking->setEstado(Booking::ESTADO_PENDIENTE);
@@ -72,7 +108,7 @@ class BookingController extends AbstractController
             return $this->redirectToRoute('app_booking_index');
         }
 
-        return $this->render('booking/new.html.twig', ['form' => $form]);
+        return $this->render('booking/new.html.twig', ['form' => $form, 'empresa' => $empresa]);
     }
 
     #[Route('/{id}', name: 'app_booking_show', methods: ['GET'])]
@@ -99,13 +135,26 @@ class BookingController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($repo->hasConflict(
-                $booking->getResource()->getId(),
+            $conflicts = $repo->findConflictingBookings(
+                $booking->getResource(),
                 $booking->getFechaInicio(),
                 $booking->getFechaFin(),
                 $booking->getId()
-            )) {
-                $this->addFlash('danger', 'El recurso ya está reservado en ese horario.');
+            );
+
+            if (!empty($conflicts)) {
+                $detalles = implode('; ', array_map(
+                    fn(Booking $c) => sprintf(
+                        'del %s al %s',
+                        $c->getFechaInicio()->format('d/m/Y H:i'),
+                        $c->getFechaFin()->format('d/m/Y H:i')
+                    ),
+                    $conflicts
+                ));
+                $this->addFlash('danger', sprintf(
+                    'El recurso ya está reservado en ese horario (%s). Por favor, elige otro horario o recurso.',
+                    $detalles
+                ));
                 return $this->render('booking/edit.html.twig', ['form' => $form, 'booking' => $booking]);
             }
 
@@ -115,6 +164,21 @@ class BookingController extends AbstractController
         }
 
         return $this->render('booking/edit.html.twig', ['form' => $form, 'booking' => $booking]);
+    }
+
+    #[Route('/{id}/confirmar', name: 'app_booking_confirmar', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function confirmar(Request $request, Booking $booking, EntityManagerInterface $em): Response
+    {
+        if (!$this->isCsrfTokenValid('confirmar' . $booking->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Token CSRF inválido.');
+        }
+
+        $booking->setEstado(Booking::ESTADO_CONFIRMADA);
+        $em->flush();
+        $this->addFlash('success', 'Reserva confirmada correctamente.');
+
+        return $this->redirectToRoute('app_booking_index');
     }
 
     #[Route('/{id}/cancel', name: 'app_booking_cancel', methods: ['POST'])]

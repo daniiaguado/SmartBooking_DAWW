@@ -50,6 +50,9 @@ class Booking
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $motivo = null;
 
+    #[ORM\Column(length: 200, nullable: true)]
+    private ?string $clienteNombre = null;
+
     #[ORM\Column(length: 20)]
     private string $estado = self::ESTADO_PENDIENTE;
 
@@ -102,6 +105,9 @@ class Booking
 
     public function getMotivo(): ?string { return $this->motivo; }
     public function setMotivo(?string $motivo): static { $this->motivo = $motivo; return $this; }
+
+    public function getClienteNombre(): ?string { return $this->clienteNombre; }
+    public function setClienteNombre(?string $clienteNombre): static { $this->clienteNombre = $clienteNombre; return $this; }
 
     public function getEstado(): string { return $this->estado; }
     public function setEstado(string $estado): static { $this->estado = $estado; return $this; }

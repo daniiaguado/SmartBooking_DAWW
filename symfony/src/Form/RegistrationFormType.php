@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
@@ -21,23 +22,70 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nombre', TextType::class, [
-                'label' => 'Nombre',
-                'attr'  => ['class' => 'form-control', 'placeholder' => 'Tu nombre'],
+            // ── Tipo de usuario ──────────────────────────────────────────────
+            ->add('userType', ChoiceType::class, [
+                'label'   => false,
+                'choices' => [
+                    'Persona física' => User::TYPE_PERSONA,
+                    'Empresa'        => User::TYPE_EMPRESA,
+                ],
+                'expanded' => false,
+                'multiple' => false,
+                'attr'     => ['class' => 'form-select d-none', 'id' => 'userTypeSelect'],
+                'data'     => User::TYPE_PERSONA,
             ])
-            ->add('apellidos', TextType::class, [
-                'label' => 'Apellidos',
-                'attr'  => ['class' => 'form-control', 'placeholder' => 'Tus apellidos'],
-            ])
+
+            // ── Datos comunes ─────────────────────────────────────────────────
             ->add('email', EmailType::class, [
                 'label' => 'Email',
                 'attr'  => ['class' => 'form-control', 'placeholder' => 'tu@email.com'],
+            ])
+
+            // ── Datos de Persona ──────────────────────────────────────────────
+            ->add('nombre', TextType::class, [
+                'label'    => 'Nombre',
+                'required' => false,
+                'attr'     => ['class' => 'form-control', 'placeholder' => 'Tu nombre'],
+            ])
+            ->add('apellidos', TextType::class, [
+                'label'    => 'Apellidos',
+                'required' => false,
+                'attr'     => ['class' => 'form-control', 'placeholder' => 'Tus apellidos'],
+            ])
+            ->add('dni', TextType::class, [
+                'label'    => 'DNI',
+                'required' => false,
+                'attr'     => ['class' => 'form-control', 'placeholder' => '12345678A'],
             ])
             ->add('telefono', TelType::class, [
                 'label'    => 'Teléfono',
                 'required' => false,
                 'attr'     => ['class' => 'form-control', 'placeholder' => '+34 600 000 000'],
             ])
+
+            // ── Datos de Empresa ──────────────────────────────────────────────
+            ->add('nombreEmpresa', TextType::class, [
+                'label'    => 'Nombre de la empresa',
+                'required' => false,
+                'attr'     => ['class' => 'form-control', 'placeholder' => 'Nombre comercial'],
+            ])
+            ->add('cif', TextType::class, [
+                'label'    => 'CIF',
+                'required' => false,
+                'attr'     => ['class' => 'form-control', 'placeholder' => 'B12345678'],
+            ])
+            ->add('sector', TextType::class, [
+                'label'    => 'Sector de actividad',
+                'required' => false,
+                'attr'     => ['class' => 'form-control', 'placeholder' => 'Tecnología, Hostelería…'],
+            ])
+            ->add('telefonoEmpresa', TelType::class, [
+                'label'    => 'Teléfono de empresa',
+                'required' => false,
+                'attr'     => ['class' => 'form-control', 'placeholder' => '+34 900 000 000'],
+            ])
+
+            // ── Contraseña ────────────────────────────────────────────────────
             ->add('plainPassword', RepeatedType::class, [
                 'type'            => PasswordType::class,
                 'mapped'          => false,
@@ -55,6 +103,8 @@ class RegistrationFormType extends AbstractType
                 ],
                 'invalid_message' => 'Las contraseñas no coinciden.',
             ])
+
+            // ── Términos ──────────────────────────────────────────────────────
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped'      => false,
                 'label'       => 'Acepto los términos y condiciones',

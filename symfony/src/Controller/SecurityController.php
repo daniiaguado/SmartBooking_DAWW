@@ -48,12 +48,16 @@ class SecurityController extends AbstractController
             $user->setPassword(
                 $hasher->hashPassword($user, $form->get('plainPassword')->getData())
             );
-            $user->setRoles(['ROLE_USER']);
+
+            // Asignar rol según tipo de usuario
+            $role = $user->isEmpresa() ? 'ROLE_EMPRESA' : 'ROLE_PERSONA';
+            $user->setRoles(['ROLE_USER', $role]);
 
             $em->persist($user);
             $em->flush();
 
-            $this->addFlash('success', '¡Cuenta creada correctamente! Ya puedes iniciar sesión.');
+            $tipo = $user->isEmpresa() ? 'empresa' : 'persona';
+            $this->addFlash('success', "¡Cuenta de {$tipo} creada correctamente! Ya puedes iniciar sesión.");
 
             return $this->redirectToRoute('app_login');
         }

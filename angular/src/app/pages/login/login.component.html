@@ -1,0 +1,207 @@
+<div class="auth-split-wrapper">
+
+  <!-- ── PANEL IZQUIERDO (solo desktop) ─────────────────────────── -->
+  <div class="col-lg-6 d-none d-lg-flex login-left-panel">
+    <div style="position:relative;z-index:1;width:100%">
+
+      <!-- Logo/marca -->
+      <div class="d-flex align-items-center gap-3 mb-5">
+        <div style="width:48px;height:48px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(99,102,241,.5);">
+          <i class="bi bi-calendar-check text-white" style="font-size:1.5rem"></i>
+        </div>
+        <div>
+          <div style="font-size:1.25rem;font-weight:800;color:#fff;letter-spacing:-.02em">SmartBooking</div>
+          <div style="font-size:0.72rem;color:#94a3b8;font-weight:500;letter-spacing:.04em;text-transform:uppercase">Sistema de Reservas</div>
+        </div>
+      </div>
+
+      <!-- Frase principal -->
+      <h2 style="font-size:2rem;font-weight:700;color:#fff;letter-spacing:-.03em;line-height:1.25;margin-bottom:.85rem">
+        Gestiona tus reservas<br>
+        <span style="background:linear-gradient(90deg,#a5b4fc,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">
+          con total eficiencia
+        </span>
+      </h2>
+      <p style="color:#94a3b8;font-size:.9rem;margin-bottom:2.25rem;line-height:1.7;max-width:360px">
+        Plataforma inteligente para gestionar espacios,
+        recursos y reservas en tiempo real.
+      </p>
+
+      <!-- Features — 3 items compactos -->
+      <div class="d-flex flex-column gap-3 mb-4">
+        <div class="d-flex align-items-center gap-3">
+          <div class="login-feature-icon"><i class="bi bi-shield-check"></i></div>
+          <span style="color:#e2e8f0;font-size:.9rem;font-weight:500">Seguro y confiable</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <div class="login-feature-icon"><i class="bi bi-lightning-charge"></i></div>
+          <span style="color:#e2e8f0;font-size:.9rem;font-weight:500">Rápido y eficiente</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <div class="login-feature-icon"><i class="bi bi-people"></i></div>
+          <span style="color:#e2e8f0;font-size:.9rem;font-weight:500">Multiusuario</span>
+        </div>
+      </div>
+
+      <!-- Testimonio decorativo -->
+      <div class="login-quote-card mt-4">
+        <p style="color:#cbd5e1;font-style:italic;font-size:.875rem;line-height:1.65;margin-bottom:.85rem">
+          "SmartBooking ha transformado la gestión de nuestras instalaciones. Todo es más rápido, claro y organizado."
+        </p>
+        <div class="d-flex align-items-center gap-2">
+          <div style="width:32px;height:32px;background:linear-gradient(135deg,#6366f1,#818cf8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:#fff;flex-shrink:0">MG</div>
+          <div>
+            <div style="color:#e2e8f0;font-size:.8rem;font-weight:600">María García</div>
+            <div style="color:#64748b;font-size:.72rem">Coordinadora de Recursos · Centro Cívico Norte</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer copyright -->
+      <div style="margin-top:2.5rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,.07)">
+        <p style="color:#475569;font-size:.75rem;margin:0">
+          &copy; {{ currentYear }} SmartBooking · Todos los derechos reservados
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── PANEL DERECHO – formulario ─────────────────────────────── -->
+  <div class="col-12 col-lg-6 auth-right-panel">
+    <div style="width:100%;max-width:420px">
+
+      <!-- Logo (solo móvil) -->
+      <div class="d-flex d-lg-none align-items-center justify-content-center gap-2 mb-5">
+        <div style="width:40px;height:40px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(99,102,241,.4);">
+          <i class="bi bi-calendar-check text-white" style="font-size:1.2rem"></i>
+        </div>
+        <span style="font-size:1.25rem;font-weight:800;color:#0f172a;letter-spacing:-.02em">SmartBooking</span>
+      </div>
+
+      <!-- Encabezado del formulario -->
+      <div class="mb-5">
+        <h1 style="font-size:1.75rem;font-weight:800;color:#0f172a;letter-spacing:-.03em;margin-bottom:.4rem">
+          Bienvenido de vuelta
+        </h1>
+        <p style="color:#64748b;font-size:.9rem;margin:0">Introduce tus credenciales para continuar</p>
+      </div>
+
+      <!-- Mensaje de error -->
+      <div *ngIf="errorMessage" class="alert alert-danger d-flex align-items-center gap-2 mb-4">
+        <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <!-- Formulario reactivo -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+
+        <div class="mb-4">
+          <label for="email" class="form-label">Correo electrónico</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+            <input type="email"
+                   id="email"
+                   formControlName="email"
+                   class="form-control"
+                   [class.is-invalid]="emailCtrl.invalid && emailCtrl.touched"
+                   autocomplete="email"
+                   placeholder="tu@email.com">
+            <div class="invalid-feedback">
+              <span *ngIf="emailCtrl.errors?.['required']">El email es obligatorio.</span>
+              <span *ngIf="emailCtrl.errors?.['email']">Introduce un email válido.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="password" class="form-label">Contraseña</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+            <input [type]="showPassword ? 'text' : 'password'"
+                   id="password"
+                   formControlName="password"
+                   class="form-control"
+                   [class.is-invalid]="passwordCtrl.invalid && passwordCtrl.touched"
+                   autocomplete="current-password"
+                   placeholder="••••••••">
+            <button type="button"
+                    class="btn btn-outline-secondary"
+                    (click)="togglePassword()"
+                    title="Mostrar/ocultar contraseña">
+              <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+            </button>
+            <div class="invalid-feedback">
+              <span *ngIf="passwordCtrl.errors?.['required']">La contraseña es obligatoria.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between mb-5">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="remember" formControlName="rememberMe">
+            <label class="form-check-label small" for="remember" style="color:#64748b">Recordarme</label>
+          </div>
+          <button type="button"
+                  class="btn btn-link btn-sm p-0 text-decoration-none small fw-semibold"
+                  style="color:var(--primary)"
+                  data-bs-toggle="modal"
+                  data-bs-target="#modalOlvidaste">
+            ¿Olvidaste tu contraseña?
+          </button>
+        </div>
+
+        <button type="submit"
+                class="btn btn-auth-primary w-100 mb-4"
+                style="padding:.8rem"
+                [disabled]="loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          <i *ngIf="!loading" class="bi bi-box-arrow-in-right me-2"></i>
+          {{ loading ? 'Entrando…' : 'Iniciar sesión' }}
+        </button>
+
+      </form>
+
+      <div class="d-flex align-items-center mb-4">
+        <hr class="flex-grow-1 m-0" style="border-color:#e2e8f0">
+        <span class="px-3 text-muted small">o</span>
+        <hr class="flex-grow-1 m-0" style="border-color:#e2e8f0">
+      </div>
+
+      <p class="text-center mb-0" style="font-size:.875rem;color:#64748b">
+        ¿No tienes cuenta?
+        <a routerLink="/app/register" class="fw-semibold text-decoration-none" style="color:var(--primary)">Regístrate aquí</a>
+      </p>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: Recuperar contraseña -->
+<div class="modal fade" id="modalOlvidaste" tabindex="-1" aria-labelledby="modalOlvidasteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius:16px">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold" id="modalOlvidasteLabel">
+          <i class="bi bi-key-fill me-2" style="color:var(--primary)"></i>Recuperar contraseña
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body pt-2 pb-4 px-4">
+        <div class="alert alert-info d-flex align-items-start gap-2 mb-0">
+          <i class="bi bi-info-circle-fill mt-1 flex-shrink-0"></i>
+          <div>
+            <strong>Funcionalidad en desarrollo</strong><br>
+            <span class="small">Para recuperar tu contraseña, contacta con el administrador del sistema.</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-auth-primary w-100" data-bs-dismiss="modal">
+          <i class="bi bi-check-lg me-1"></i>Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

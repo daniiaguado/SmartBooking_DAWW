@@ -32,11 +32,21 @@ security:
                 always_remember_me: false
 
     access_control:
-        - { path: ^/login,    roles: PUBLIC_ACCESS }
-        - { path: ^/register, roles: PUBLIC_ACCESS }
-        - { path: ^/$,        roles: PUBLIC_ACCESS }
-        - { path: ^/admin,    roles: ROLE_ADMIN }
-        - { path: ^/,         roles: ROLE_USER }
+        - { path: ^/login,             roles: PUBLIC_ACCESS }
+        - { path: ^/register,          roles: PUBLIC_ACCESS }
+        - { path: ^/$,                 roles: PUBLIC_ACCESS }
+        - { path: ^/app/login$,        roles: PUBLIC_ACCESS }
+        - { path: ^/app/register$,     roles: PUBLIC_ACCESS }
+        - { path: ^/api/login$,        roles: PUBLIC_ACCESS, methods: [POST] }
+        - { path: ^/api/register$,     roles: PUBLIC_ACCESS, methods: [POST] }
+        - { path: ^/api/check-email$,  roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/resources$,    roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/resources/,    roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/categories$,   roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/categories/,   roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api,               roles: ROLE_USER }
+        - { path: ^/admin,             roles: ROLE_ADMIN }
+        - { path: ^/,                  roles: ROLE_USER }
 
     role_hierarchy:
         ROLE_ADMIN: ROLE_USER

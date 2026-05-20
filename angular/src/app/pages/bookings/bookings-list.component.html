@@ -1,0 +1,122 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-0">Reservas</h4>
+    <p class="text-muted mb-0 small">Gestión de reservas del sistema</p>
+  </div>
+  <a routerLink="/app/bookings/new" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Nueva reserva
+  </a>
+</div>
+
+<div *ngIf="successMsg" class="alert alert-success alert-dismissible fade show">
+  <i class="bi bi-check-circle-fill me-2"></i>{{ successMsg }}
+  <button type="button" class="btn-close" (click)="successMsg=''"></button>
+</div>
+<div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+  {{ error }}
+  <button type="button" class="btn-close" (click)="error=''"></button>
+</div>
+
+<!-- Filtros -->
+<div class="sb-card p-3 mb-4">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label small fw-semibold">Estado</label>
+      <select class="form-select form-select-sm" [(ngModel)]="filters.estado">
+        <option value="">Todos</option>
+        <option *ngFor="let e of estados" [value]="e">{{ e | titlecase }}</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label small fw-semibold">Desde</label>
+      <input type="date" class="form-control form-control-sm" [(ngModel)]="filters.desde">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label small fw-semibold">Hasta</label>
+      <input type="date" class="form-control form-control-sm" [(ngModel)]="filters.hasta">
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+      <button class="btn btn-primary btn-sm flex-fill" (click)="applyFilters()">
+        <i class="bi bi-search me-1"></i>Filtrar
+      </button>
+      <button class="btn btn-outline-secondary btn-sm" (click)="resetFilters()">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Tabla -->
+<div class="sb-card">
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div *ngIf="!loading && bookings.length === 0" class="text-center py-5 text-muted">
+    <i class="bi bi-calendar-x fs-1 opacity-25 d-block mb-2"></i>
+    No hay reservas con los filtros seleccionados
+  </div>
+
+  <div class="table-responsive" *ngIf="!loading && bookings.length > 0">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Recurso</th>
+          <th *ngIf="auth.isAdmin">Usuario</th>
+          <th>Fecha inicio</th>
+          <th>Fecha fin</th>
+          <th>Asistentes</th>
+          <th>Precio</th>
+          <th>Estado</th>
+          <th class="text-end">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let b of bookings">
+          <td class="text-muted small">{{ b.id }}</td>
+          <td>
+            <div class="fw-semibold">{{ b.resource?.nombre }}</div>
+            <div class="text-muted small" *ngIf="b.resource?.ubicacion">{{ b.resource?.ubicacion }}</div>
+          </td>
+          <td *ngIf="auth.isAdmin">
+            <div class="small">{{ b.user?.displayName }}</div>
+            <div class="text-muted" style="font-size:.75rem">{{ b.user?.email }}</div>
+          </td>
+          <td class="small">{{ b.fechaInicio | date:'dd/MM/yy HH:mm' }}</td>
+          <td class="small">{{ b.fechaFin | date:'dd/MM/yy HH:mm' }}</td>
+          <td class="text-center">{{ b.asistentes }}</td>
+          <td class="fw-semibold">{{ b.precioTotal ? (b.precioTotal + ' €') : '–' }}</td>
+          <td>
+            <span class="badge rounded-pill" [ngClass]="estadoBadge(b.estado)">{{ b.estado }}</span>
+          </td>
+          <td class="text-end">
+            <div class="d-flex justify-content-end gap-1">
+              <a [routerLink]="['/app/bookings', b.id]" class="btn btn-sm btn-outline-primary" title="Ver detalle">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a [routerLink]="['/app/bookings', b.id, 'edit']" class="btn btn-sm btn-outline-secondary" title="Editar">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <button *ngIf="auth.isAdmin && b.estado === 'pendiente'"
+                      class="btn btn-sm btn-outline-success" title="Confirmar"
+                      (click)="confirmar(b.id)">
+                <i class="bi bi-check-lg"></i>
+              </button>
+              <button *ngIf="b.estado !== 'cancelada'"
+                      class="btn btn-sm btn-outline-warning" title="Cancelar"
+                      (click)="cancelar(b.id)">
+                <i class="bi bi-x-circle"></i>
+              </button>
+              <button *ngIf="auth.isAdmin"
+                      class="btn btn-sm btn-outline-danger" title="Eliminar"
+                      (click)="eliminar(b.id)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

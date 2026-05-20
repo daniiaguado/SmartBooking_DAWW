@@ -1,4 +1,27 @@
 // SmartBooking Angular Global Styles
+
+// ── Variables SmartBooking (sincronizado con base.html.twig) ─────────────────
+:root {
+  --sb-primary:        #6366f1;
+  --sb-primary-dark:   #4f46e5;
+  --sb-primary-light:  #e0e7ff;
+  --sb-secondary:      #0ea5e9;
+  --sb-success:        #10b981;
+  --sb-warning:        #f59e0b;
+  --sb-danger:         #ef4444;
+  --sb-body-bg:        #f8fafc;
+  --sb-card-shadow:    0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--sb-body-bg);
+}
+
+.badge-pendiente  { background-color: var(--sb-warning) !important; color: #fff !important; font-weight: 600; }
+.badge-confirmada { background-color: var(--sb-success) !important; color: #fff !important; font-weight: 600; }
+.badge-cancelada  { background-color: var(--sb-danger)  !important; color: #fff !important; font-weight: 600; }
+
 // Angular Elements – estilos complementarios para componentes embebidos en Twig
 
 // ============================================================
@@ -112,4 +135,126 @@ app-form-validator {
 @keyframes sbFadeIn {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+// ============================================================
+// Dark Mode Toggle Button
+// ============================================================
+.sb-theme-toggle {
+  background: transparent !important;
+  border: 1px solid rgba(255,255,255,0.25) !important;
+  color: #94a3b8 !important;
+  border-radius: 8px !important;
+  width: 36px;
+  height: 36px;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s !important;
+
+  &:hover {
+    background: rgba(255,255,255,0.1) !important;
+    color: #fff !important;
+  }
+}
+
+// ============================================================
+// Dark Mode
+// ============================================================
+body.sb-dark {
+  background-color: #0f172a !important;
+  color: #e2e8f0 !important;
+}
+
+body.sb-dark .sb-topnav {
+  background: #020817 !important;
+  border-bottom-color: #1e293b !important;
+}
+
+body.sb-dark .card {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+body.sb-dark .card-header {
+  background: #1e293b !important;
+  border-bottom-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+body.sb-dark .table {
+  --bs-table-bg: #1e293b;
+  --bs-table-striped-bg: #243044;
+  --bs-table-hover-bg: #2d3f55;
+  color: #e2e8f0 !important;
+}
+
+body.sb-dark .table thead th {
+  background: #0f172a !important;
+  color: #94a3b8 !important;
+  border-bottom-color: #334155 !important;
+}
+
+body.sb-dark .table tbody td {
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+body.sb-dark .table tbody tr:hover {
+  background: #1e293b !important;
+}
+
+body.sb-dark .form-control,
+body.sb-dark .form-select {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+body.sb-dark .form-control::placeholder {
+  color: #64748b !important;
+}
+
+body.sb-dark .form-label {
+  color: #94a3b8 !important;
+}
+
+body.sb-dark .kpi-card,
+body.sb-dark .stat-card {
+  background: #1e293b !important;
+  color: #e2e8f0 !important;
+}
+
+body.sb-dark .kpi-value { color: #f1f5f9 !important; }
+body.sb-dark .kpi-label { color: #94a3b8 !important; }
+
+body.sb-dark h1, body.sb-dark h2, body.sb-dark h3,
+body.sb-dark h4, body.sb-dark h5, body.sb-dark h6 {
+  color: #f1f5f9 !important;
+}
+
+body.sb-dark .text-muted { color: #64748b !important; }
+
+body.sb-dark .dropdown-menu {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+body.sb-dark .dropdown-item { color: #cbd5e1 !important; }
+
+body.sb-dark .dropdown-item:hover {
+  background: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+body.sb-dark .upcoming-item { border-bottom-color: #334155 !important; }
+
+body.sb-dark .alert {
+  border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+body.sb-dark .badge {
+  border: 1px solid rgba(255,255,255,0.1) !important;
 }

@@ -1,0 +1,442 @@
+<div *ngIf="loading" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status"></div>
+</div>
+
+<div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     DASHBOARD ROLE_PERSONA
+     ═══════════════════════════════════════════════════════════════════ -->
+<div *ngIf="data && !loading && isPersona">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-0">Dashboard</h4>
+      <p class="text-muted mb-0 small">Bienvenido, {{ auth.currentUser?.displayName }}</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a routerLink="/app/empresas" class="btn btn-outline-primary">
+        <i class="bi bi-building me-1"></i>Buscar empresa
+      </a>
+      <a routerLink="/app/bookings/new" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Nueva reserva
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="sb-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-3 p-3" style="background:rgba(99,102,241,.12)">
+            <i class="bi bi-calendar3 fs-4" style="color:var(--sb-primary)"></i>
+          </div>
+          <div>
+            <div class="fs-2 fw-bold">{{ data.totalReservas }}</div>
+            <div class="text-muted small">Mis reservas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="sb-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-3 p-3" style="background:rgba(16,185,129,.12)">
+            <i class="bi bi-check-circle-fill fs-4" style="color:var(--sb-success)"></i>
+          </div>
+          <div>
+            <div class="fs-2 fw-bold text-success">{{ data.reservasConfirmadas }}</div>
+            <div class="text-muted small">Confirmadas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="sb-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-3 p-3" style="background:rgba(245,158,11,.12)">
+            <i class="bi bi-clock-fill fs-4" style="color:var(--sb-warning)"></i>
+          </div>
+          <div>
+            <div class="fs-2 fw-bold" style="color:var(--sb-warning)">{{ data.reservasPendientes }}</div>
+            <div class="text-muted small">Pendientes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="sb-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-3 p-3" style="background:rgba(239,68,68,.12)">
+            <i class="bi bi-x-circle-fill fs-4" style="color:var(--sb-danger)"></i>
+          </div>
+          <div>
+            <div class="fs-2 fw-bold text-danger">{{ data.reservasCanceladas }}</div>
+            <div class="text-muted small">Canceladas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sb-card">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 px-4">
+      <h6 class="mb-0 fw-bold"><i class="bi bi-calendar-event me-2 text-primary"></i>Próximas reservas</h6>
+      <a routerLink="/app/bookings" class="btn btn-sm btn-outline-primary">Ver todas</a>
+    </div>
+    <div class="card-body p-0">
+      <div *ngIf="data.proximasReservas.length === 0" class="text-center py-5 text-muted">
+        <i class="bi bi-calendar-x fs-1 opacity-25 d-block mb-2"></i>
+        No hay próximas reservas
+      </div>
+      <div class="table-responsive" *ngIf="data.proximasReservas.length > 0">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Recurso</th>
+              <th>Fecha inicio</th>
+              <th>Duración</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let b of data.proximasReservas">
+              <td>
+                <a [routerLink]="['/app/bookings', b.id]" class="fw-semibold text-decoration-none text-reset">
+                  {{ b.resource?.nombre }}
+                </a>
+                <div class="text-muted small">{{ b.resource?.ubicacion }}</div>
+              </td>
+              <td>{{ b.fechaInicio | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ b.duracionHoras }}h</td>
+              <td>
+                <span class="badge rounded-pill" [ngClass]="estadoBadge(b.estado)">
+                  {{ b.estado }}
+                </span>
+              </td>
+              <td>
+                <div class="d-flex gap-1">
+                  <a [routerLink]="['/app/bookings', b.id]" class="btn btn-sm btn-outline-primary" title="Ver detalle">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  <a [routerLink]="['/app/bookings', b.id, 'edit']" class="btn btn-sm btn-outline-secondary" title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     DASHBOARD ROLE_EMPRESA
+     ═══════════════════════════════════════════════════════════════════ -->
+<div *ngIf="data && !loading && isEmpresa">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-0">Panel de empresa</h4>
+      <p class="text-muted mb-0 small">{{ data.nombreEmpresa }}</p>
+    </div>
+    <a routerLink="/app/mi-empresa" class="btn btn-outline-primary">
+      <i class="bi bi-pencil me-1"></i>Editar datos de empresa
+    </a>
+  </div>
+
+  <!-- Datos de la empresa -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="sb-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-3 p-3" style="background:rgba(14,165,233,.12)">
+            <i class="bi bi-building-fill fs-4" style="color:#0ea5e9"></i>
+          </div>
+          <div>
+            <div class="fw-bold">{{ data.nombreEmpresa }}</div>
+            <div class="text-muted small">Nombre empresa</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="sb-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-3 p-3" style="background:rgba(99,102,241,.12)">
+            <i class="bi bi-file-earmark-text-fill fs-4" style="color:var(--sb-primary)"></i>
+          </div>
+          <div>
+            <div class="fw-bold">{{ data.cif || '—' }}</div>
+            <div class="text-muted small">CIF</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="sb-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-3 p-3" style="background:rgba(16,185,129,.12)">
+            <i class="bi bi-briefcase-fill fs-4" style="color:var(--sb-success)"></i>
+          </div>
+          <div>
+            <div class="fw-bold">{{ data.sector || '—' }}</div>
+            <div class="text-muted small">Sector</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs reservas recibidas -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="sb-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-3 p-3" style="background:rgba(99,102,241,.12)">
+            <i class="bi bi-calendar3 fs-4" style="color:var(--sb-primary)"></i>
+          </div>
+          <div>
+            <div class="fs-2 fw-bold">{{ data.totalReservas }}</div>
+            <div class="text-muted small">Total recibidas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="sb-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-3 p-3" style="background:rgba(16,185,129,.12)">
+            <i class="bi bi-check-circle-fill fs-4" style="color:var(--sb-success)"></i>
+          </div>
+          <div>
+            <div class="fs-2 fw-bold text-success">{{ data.reservasConfirmadas }}</div>
+            <div class="text-muted small">Confirmadas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="sb-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-3 p-3" style="background:rgba(245,158,11,.12)">
+            <i class="bi bi-clock-fill fs-4" style="color:var(--sb-warning)"></i>
+          </div>
+          <div>
+            <div class="fs-2 fw-bold" style="color:var(--sb-warning)">{{ data.reservasPendientes }}</div>
+            <div class="text-muted small">Pendientes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="sb-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-3 p-3" style="background:rgba(239,68,68,.12)">
+            <i class="bi bi-x-circle-fill fs-4" style="color:var(--sb-danger)"></i>
+          </div>
+          <div>
+            <div class="fs-2 fw-bold text-danger">{{ data.reservasCanceladas }}</div>
+            <div class="text-muted small">Canceladas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Últimas reservas recibidas -->
+  <div class="sb-card">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 px-4">
+      <h6 class="mb-0 fw-bold"><i class="bi bi-calendar-event me-2 text-primary"></i>Últimas reservas recibidas</h6>
+      <a routerLink="/app/bookings" class="btn btn-sm btn-outline-primary">Ver todas</a>
+    </div>
+    <div class="card-body p-0">
+      <div *ngIf="!data.ultimasReservasRecibidas || data.ultimasReservasRecibidas.length === 0"
+           class="text-center py-5 text-muted">
+        <i class="bi bi-calendar-x fs-1 opacity-25 d-block mb-2"></i>
+        No hay reservas recibidas
+      </div>
+      <div class="table-responsive" *ngIf="data.ultimasReservasRecibidas && data.ultimasReservasRecibidas.length > 0">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Recurso</th>
+              <th>Cliente</th>
+              <th>Fecha inicio</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let b of data.ultimasReservasRecibidas">
+              <td>
+                <span class="fw-semibold">{{ b.resource?.nombre }}</span>
+                <div class="text-muted small">{{ b.resource?.ubicacion }}</div>
+              </td>
+              <td>{{ b.user?.displayName || b.clienteNombre || '—' }}</td>
+              <td>{{ b.fechaInicio | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                <span class="badge rounded-pill" [ngClass]="estadoBadge(b.estado)">
+                  {{ b.estado }}
+                </span>
+              </td>
+              <td>
+                <a [routerLink]="['/app/bookings', b.id]" class="btn btn-sm btn-outline-primary" title="Ver detalle">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     DASHBOARD ROLE_ADMIN
+     ═══════════════════════════════════════════════════════════════════ -->
+<div *ngIf="data && !loading && isAdmin">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-0">Panel de administración</h4>
+      <p class="text-muted mb-0 small">Visión global del sistema</p>
+    </div>
+  </div>
+
+  <!-- KPIs globales -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="sb-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-3 p-3" style="background:rgba(99,102,241,.12)">
+            <i class="bi bi-calendar3 fs-4" style="color:var(--sb-primary)"></i>
+          </div>
+          <div>
+            <div class="fs-2 fw-bold">{{ data.totalReservas }}</div>
+            <div class="text-muted small">Total reservas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="sb-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-3 p-3" style="background:rgba(16,185,129,.12)">
+            <i class="bi bi-check-circle-fill fs-4" style="color:var(--sb-success)"></i>
+          </div>
+          <div>
+            <div class="fs-2 fw-bold text-success">{{ data.reservasConfirmadas }}</div>
+            <div class="text-muted small">Confirmadas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="sb-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-3 p-3" style="background:rgba(245,158,11,.12)">
+            <i class="bi bi-clock-fill fs-4" style="color:var(--sb-warning)"></i>
+          </div>
+          <div>
+            <div class="fs-2 fw-bold" style="color:var(--sb-warning)">{{ data.reservasPendientes }}</div>
+            <div class="text-muted small">Pendientes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="sb-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-3 p-3" style="background:rgba(148,163,184,.12)">
+            <i class="bi bi-people-fill fs-4" style="color:#64748b"></i>
+          </div>
+          <div>
+            <div class="fs-2 fw-bold">{{ data.totalUsuarios ?? '—' }}</div>
+            <div class="text-muted small">Usuarios</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acciones rápidas admin -->
+  <div class="row g-3 mb-4">
+    <div class="col-12">
+      <div class="sb-card p-4">
+        <h6 class="fw-bold mb-3"><i class="bi bi-lightning-fill me-2 text-warning"></i>Acciones rápidas</h6>
+        <div class="d-flex flex-wrap gap-2">
+          <a routerLink="/app/bookings" class="btn btn-outline-primary">
+            <i class="bi bi-calendar3 me-1"></i>Gestionar reservas
+          </a>
+          <a routerLink="/app/resources" class="btn btn-outline-secondary">
+            <i class="bi bi-building-fill me-1"></i>Gestionar recursos
+          </a>
+          <a routerLink="/app/categories" class="btn btn-outline-secondary">
+            <i class="bi bi-tags-fill me-1"></i>Gestionar categorías
+          </a>
+          <a routerLink="/app/empresas" class="btn btn-outline-secondary">
+            <i class="bi bi-building me-1"></i>Ver empresas
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Próximas reservas (admin: todas) -->
+  <div class="sb-card">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 px-4">
+      <h6 class="mb-0 fw-bold"><i class="bi bi-calendar-event me-2 text-primary"></i>Próximas reservas del sistema</h6>
+      <a routerLink="/app/bookings" class="btn btn-sm btn-outline-primary">Ver todas</a>
+    </div>
+    <div class="card-body p-0">
+      <div *ngIf="data.proximasReservas.length === 0" class="text-center py-5 text-muted">
+        <i class="bi bi-calendar-x fs-1 opacity-25 d-block mb-2"></i>
+        No hay próximas reservas
+      </div>
+      <div class="table-responsive" *ngIf="data.proximasReservas.length > 0">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Recurso</th>
+              <th>Usuario</th>
+              <th>Fecha inicio</th>
+              <th>Duración</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let b of data.proximasReservas">
+              <td>
+                <a [routerLink]="['/app/bookings', b.id]" class="fw-semibold text-decoration-none text-reset">
+                  {{ b.resource?.nombre }}
+                </a>
+                <div class="text-muted small">{{ b.resource?.ubicacion }}</div>
+              </td>
+              <td class="small">{{ b.user?.displayName }}</td>
+              <td>{{ b.fechaInicio | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ b.duracionHoras }}h</td>
+              <td>
+                <span class="badge rounded-pill" [ngClass]="estadoBadge(b.estado)">
+                  {{ b.estado }}
+                </span>
+              </td>
+              <td>
+                <div class="d-flex gap-1">
+                  <a [routerLink]="['/app/bookings', b.id]" class="btn btn-sm btn-outline-primary" title="Ver detalle">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  <a [routerLink]="['/app/bookings', b.id, 'edit']" class="btn btn-sm btn-outline-secondary" title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -34,4 +34,27 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getQuery()
             ->getResult();
     }
+
+    public function searchEmpresas(string $query): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.userType = :tipo')
+            ->andWhere('u.nombreEmpresa LIKE :query')
+            ->setParameter('tipo', 'empresa')
+            ->setParameter('query', '%' . $query . '%')
+            ->orderBy('u.nombreEmpresa', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllEmpresas(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.userType = :tipo')
+            ->andWhere('u.isActive = true')
+            ->setParameter('tipo', 'empresa')
+            ->orderBy('u.nombreEmpresa', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

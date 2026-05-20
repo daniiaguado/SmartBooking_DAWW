@@ -1,0 +1,77 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-0">Categorías</h4>
+    <p class="text-muted mb-0 small">Organiza los recursos por categorías</p>
+  </div>
+  <button class="btn btn-primary" (click)="openNew()">
+    <i class="bi bi-plus-lg me-1"></i>Nueva categoría
+  </button>
+</div>
+
+<div *ngIf="successMsg" class="alert alert-success alert-dismissible fade show">
+  <i class="bi bi-check-circle-fill me-2"></i>{{ successMsg }}
+  <button type="button" class="btn-close" (click)="successMsg=''"></button>
+</div>
+<div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+  {{ error }}
+  <button type="button" class="btn-close" (click)="error=''"></button>
+</div>
+
+<!-- Formulario inline -->
+<div class="sb-card p-4 mb-4" *ngIf="showForm">
+  <h6 class="fw-bold mb-3">{{ editingCategory ? 'Editar categoría' : 'Nueva categoría' }}</h6>
+  <div class="row g-3">
+    <div class="col-md-5">
+      <label class="form-label small fw-semibold">Nombre *</label>
+      <input class="form-control" [(ngModel)]="form.nombre" placeholder="Nombre de la categoría">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold">Color</label>
+      <input type="color" class="form-control form-control-color w-100" [(ngModel)]="form.color">
+    </div>
+    <div class="col-md-5">
+      <label class="form-label small fw-semibold">Descripción</label>
+      <input class="form-control" [(ngModel)]="form.descripcion" placeholder="Descripción opcional">
+    </div>
+  </div>
+  <div class="d-flex gap-2 mt-3">
+    <button class="btn btn-primary btn-sm" (click)="save()">
+      <i class="bi bi-check-lg me-1"></i>Guardar
+    </button>
+    <button class="btn btn-outline-secondary btn-sm" (click)="showForm=false">Cancelar</button>
+  </div>
+</div>
+
+<div *ngIf="loading" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status"></div>
+</div>
+
+<div *ngIf="!loading && categories.length === 0" class="text-center py-5 text-muted">
+  <i class="bi bi-tags fs-1 opacity-25 d-block mb-2"></i>
+  No hay categorías
+</div>
+
+<div class="row g-3" *ngIf="!loading && categories.length > 0">
+  <div class="col-md-4 col-lg-3" *ngFor="let c of categories">
+    <div class="sb-card p-4 h-100">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="rounded-3 p-2" [style.background]="c.color + '22'">
+          <i class="bi bi-tag-fill fs-4" [style.color]="c.color"></i>
+        </div>
+        <div>
+          <div class="fw-bold">{{ c.nombre }}</div>
+          <div class="text-muted small">{{ c.totalRecursos }} recurso(s)</div>
+        </div>
+      </div>
+      <p class="text-muted small mb-3" *ngIf="c.descripcion">{{ c.descripcion }}</p>
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-secondary flex-fill" (click)="openEdit(c)">
+          <i class="bi bi-pencil me-1"></i>Editar
+        </button>
+        <button class="btn btn-sm btn-outline-danger" (click)="delete(c)">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

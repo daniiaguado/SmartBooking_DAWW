@@ -11,7 +11,7 @@
                 {{ form_start(form) }}
 
                 <div class="mb-3">
-                    {{ form_label(form.nombre) }}
+                    {{ form_label(form.nombre, 'Nombre <span class="text-danger">*</span>', {'label_html': true}) }}
                     {{ form_widget(form.nombre) }}
                     {{ form_errors(form.nombre) }}
                 </div>
@@ -21,7 +21,7 @@
                     {{ form_errors(form.descripcion) }}
                 </div>
                 <div class="mb-4">
-                    {{ form_label(form.color) }}
+                    {{ form_label(form.color, 'Color identificativo <span class="text-danger">*</span>', {'label_html': true}) }}
                     <div class="d-flex gap-3 align-items-center">
                         {{ form_widget(form.color) }}
                         <div class="rounded-3 flex-grow-1 d-flex align-items-center justify-content-center text-white fw-bold"
@@ -31,6 +31,8 @@
                     </div>
                     {{ form_errors(form.color) }}
                 </div>
+
+                <p class="text-muted small mb-3"><span class="text-danger">*</span> Campos obligatorios</p>
 
                 <div class="d-flex gap-2 justify-content-end">
                     <a href="{{ path('app_category_index') }}" class="btn btn-outline-secondary">

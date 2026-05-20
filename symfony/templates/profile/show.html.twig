@@ -1,0 +1,123 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mi Perfil{% endblock %}
+{% block page_title %}<i class="bi bi-person-circle me-2"></i>Mi Perfil{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+
+        {# ── Tarjeta principal ─────────────────────────────────────────────── #}
+        <div class="sb-card card mb-4">
+            <div class="card-body p-4">
+
+                {# Cabecera con avatar e identidad #}
+                <div class="d-flex align-items-center gap-4 mb-4 pb-4 border-bottom">
+                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold flex-shrink-0"
+                         style="width:80px;height:80px;font-size:1.75rem">
+                        {{ user.initials }}
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-1">{{ user.displayName }}</h4>
+                        <div class="text-muted mb-2">{{ user.email }}</div>
+                        {% if user.userType == 'persona' %}
+                            <span class="badge bg-secondary"><i class="bi bi-person-fill me-1"></i>Persona</span>
+                        {% else %}
+                            <span class="badge bg-info text-dark"><i class="bi bi-building me-1"></i>Empresa</span>
+                        {% endif %}
+                        {% if user.isAdmin %}
+                            <span class="badge bg-danger ms-1"><i class="bi bi-shield-fill me-1"></i>Admin</span>
+                        {% endif %}
+                    </div>
+                    <div class="ms-auto">
+                        <a href="{{ path('app_profile_edit') }}" class="btn btn-primary">
+                            <i class="bi bi-pencil-square me-1"></i>Editar perfil
+                        </a>
+                    </div>
+                </div>
+
+                {# Datos según tipo #}
+                {% if user.userType == 'persona' %}
+                    <h6 class="text-uppercase text-muted fw-semibold mb-3" style="font-size:.75rem;letter-spacing:.08em">
+                        <i class="bi bi-person me-1"></i>Datos personales
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="text-muted small mb-1">Nombre</div>
+                            <div class="fw-semibold">{{ user.nombre ?: '—' }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-muted small mb-1">Apellidos</div>
+                            <div class="fw-semibold">{{ user.apellidos ?: '—' }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-muted small mb-1">DNI</div>
+                            <div class="fw-semibold">{{ user.dni ?: '—' }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-muted small mb-1">Teléfono</div>
+                            <div class="fw-semibold">{{ user.telefono ?: '—' }}</div>
+                        </div>
+                    </div>
+                {% else %}
+                    <h6 class="text-uppercase text-muted fw-semibold mb-3" style="font-size:.75rem;letter-spacing:.08em">
+                        <i class="bi bi-building me-1"></i>Datos de empresa
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="text-muted small mb-1">Nombre de la empresa</div>
+                            <div class="fw-semibold">{{ user.nombreEmpresa ?: '—' }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-muted small mb-1">CIF</div>
+                            <div class="fw-semibold">{{ user.cif ?: '—' }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-muted small mb-1">Sector</div>
+                            <div class="fw-semibold">{{ user.sector ?: '—' }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-muted small mb-1">Teléfono de empresa</div>
+                            <div class="fw-semibold">{{ user.telefonoEmpresa ?: '—' }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {# Información de cuenta #}
+                <hr class="my-4">
+                <h6 class="text-uppercase text-muted fw-semibold mb-3" style="font-size:.75rem;letter-spacing:.08em">
+                    <i class="bi bi-gear me-1"></i>Cuenta
+                </h6>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="text-muted small mb-1">Email</div>
+                        <div class="fw-semibold">{{ user.email }}</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted small mb-1">Miembro desde</div>
+                        <div class="fw-semibold">
+                            {{ user.createdAt ? user.createdAt|date('d/m/Y') : '—' }}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted small mb-1">Estado</div>
+                        <div>
+                            {% if user.isActive %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Activo</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactivo</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted small mb-1">Reservas realizadas</div>
+                        <div class="fw-semibold">{{ user.bookings|length }}</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

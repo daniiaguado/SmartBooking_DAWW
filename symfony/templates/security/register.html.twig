@@ -3,26 +3,74 @@
 {% block title %}Registro{% endblock %}
 
 {% block body %}
-<div class="min-vh-100 d-flex align-items-center justify-content-center py-5"
-     style="background: linear-gradient(135deg, #1a2035 0%, #0d6efd 100%); margin: -1.5rem;">
-    <div class="container" style="max-width: 520px;">
+<style>
+    .sb-auth-bg {
+        background: linear-gradient(135deg, var(--sb-dark) 0%, #1e1b4b 40%, #312e81 70%, var(--sb-primary) 100%);
+        min-height: 100vh;
+        margin: -1.5rem;
+        padding: 2rem 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .sb-auth-bg::before {
+        content: '';
+        position: absolute;
+        width: 400px; height: 400px;
+        background: radial-gradient(circle, rgba(99,102,241,.25) 0%, transparent 70%);
+        top: -100px; right: -100px;
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .sb-auth-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,.35), 0 8px 24px rgba(0,0,0,.2);
+    }
+    .sb-auth-logo-wrap {
+        width: 72px; height: 72px;
+        background: linear-gradient(135deg, var(--sb-primary), var(--sb-primary-dark));
+        border-radius: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 24px rgba(99,102,241,.5);
+    }
+    .btn-auth-primary {
+        background: linear-gradient(135deg, var(--sb-primary), var(--sb-primary-dark));
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        letter-spacing: .01em;
+        padding: .65rem 1rem;
+        transition: transform 0.15s, box-shadow 0.15s;
+        color: #fff;
+    }
+    .btn-auth-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(99,102,241,.45);
+        color: #fff;
+    }
+</style>
+
+<div class="sb-auth-bg">
+    <div class="d-flex align-items-start justify-content-center" style="min-height:100%">
+    <div style="width:100%;max-width:580px;position:relative;z-index:1">
 
         <div class="text-center mb-4">
-            <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-4 shadow-lg mb-3"
-                 style="width:72px;height:72px">
-                <i class="bi bi-calendar-check text-primary" style="font-size:2rem"></i>
+            <div class="sb-auth-logo-wrap mb-3">
+                <i class="bi bi-calendar-check text-white" style="font-size:2rem"></i>
             </div>
-            <h1 class="text-white fw-bold">SmartBooking</h1>
-            <p class="text-white-50">Crea tu cuenta gratuita</p>
+            <h1 class="text-white fw-bold" style="letter-spacing:-.02em">SmartBooking</h1>
+            <p class="text-white-50" style="font-size:.9rem">Crea tu cuenta gratuita</p>
         </div>
 
-        <div class="card border-0 shadow-lg rounded-4">
-            <div class="card-body p-4">
+        <div class="card sb-auth-card">
+            <div class="card-body p-4 p-md-5">
                 <h2 class="h5 fw-bold text-center mb-4">Crear Cuenta</h2>
 
                 {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate', 'id': 'registerForm'}}) }}
 
-                {# Errores globales del formulario (CSRF, etc.) #}
+                {# Errores globales del formulario #}
                 {% if registrationForm.vars.errors|length > 0 %}
                     <div class="alert alert-danger mb-3">
                         <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -30,22 +78,32 @@
                     </div>
                 {% endif %}
 
-                {# Angular form-validator component #}
-                <app-form-validator form-id="registerForm"></app-form-validator>
-
-                <div class="row g-3 mb-3">
-                    <div class="col-6">
-                        {{ form_label(registrationForm.nombre) }}
-                        {{ form_widget(registrationForm.nombre) }}
-                        {{ form_errors(registrationForm.nombre) }}
+                {# ── SELECTOR DE TIPO ─────────────────────────────────────── #}
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Tipo de cuenta</label>
+                    <div class="row g-2" id="userTypeCards">
+                        <div class="col-6">
+                            <div class="user-type-card card border-2 rounded-3 p-3 text-center cursor-pointer active"
+                                 data-type="persona" role="button" tabindex="0">
+                                <i class="bi bi-person-fill fs-2 text-primary mb-1"></i>
+                                <div class="fw-semibold">Persona</div>
+                                <small class="text-muted">Cuenta personal</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="user-type-card card border-2 rounded-3 p-3 text-center cursor-pointer"
+                                 data-type="empresa" role="button" tabindex="0">
+                                <i class="bi bi-building fs-2 text-primary mb-1"></i>
+                                <div class="fw-semibold">Empresa</div>
+                                <small class="text-muted">Cuenta empresarial</small>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-6">
-                        {{ form_label(registrationForm.apellidos) }}
-                        {{ form_widget(registrationForm.apellidos) }}
-                        {{ form_errors(registrationForm.apellidos) }}
-                    </div>
+                    {# Campo oculto que envía el valor al formulario Symfony #}
+                    {{ form_widget(registrationForm.userType) }}
                 </div>
 
+                {# ── EMAIL ───────────────────────────────────────────────── #}
                 <div class="mb-3">
                     {{ form_label(registrationForm.email) }}
                     <div class="input-group">
@@ -55,15 +113,79 @@
                     {{ form_errors(registrationForm.email) }}
                 </div>
 
-                <div class="mb-3">
-                    {{ form_label(registrationForm.telefono) }}
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                        {{ form_widget(registrationForm.telefono) }}
+                {# ── CAMPOS PERSONA ──────────────────────────────────────── #}
+                <div id="fieldsPersona">
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            {{ form_label(registrationForm.nombre) }}
+                            {{ form_widget(registrationForm.nombre) }}
+                            {{ form_errors(registrationForm.nombre) }}
+                        </div>
+                        <div class="col-6">
+                            {{ form_label(registrationForm.apellidos) }}
+                            {{ form_widget(registrationForm.apellidos) }}
+                            {{ form_errors(registrationForm.apellidos) }}
+                        </div>
                     </div>
-                    {{ form_errors(registrationForm.telefono) }}
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            {{ form_label(registrationForm.dni) }}
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                                {{ form_widget(registrationForm.dni) }}
+                            </div>
+                            {{ form_errors(registrationForm.dni) }}
+                        </div>
+                        <div class="col-6">
+                            {{ form_label(registrationForm.telefono) }}
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                {{ form_widget(registrationForm.telefono) }}
+                            </div>
+                            {{ form_errors(registrationForm.telefono) }}
+                        </div>
+                    </div>
                 </div>
 
+                {# ── CAMPOS EMPRESA ──────────────────────────────────────── #}
+                <div id="fieldsEmpresa" class="d-none">
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.nombreEmpresa) }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-building"></i></span>
+                            {{ form_widget(registrationForm.nombreEmpresa) }}
+                        </div>
+                        {{ form_errors(registrationForm.nombreEmpresa) }}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            {{ form_label(registrationForm.cif) }}
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                                {{ form_widget(registrationForm.cif) }}
+                            </div>
+                            {{ form_errors(registrationForm.cif) }}
+                        </div>
+                        <div class="col-6">
+                            {{ form_label(registrationForm.sector) }}
+                            {{ form_widget(registrationForm.sector) }}
+                            {{ form_errors(registrationForm.sector) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.telefonoEmpresa) }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
+                            {{ form_widget(registrationForm.telefonoEmpresa) }}
+                        </div>
+                        {{ form_errors(registrationForm.telefonoEmpresa) }}
+                    </div>
+                </div>
+
+                {# ── CONTRASEÑA ──────────────────────────────────────────── #}
                 <div class="mb-3">
                     {{ form_label(registrationForm.plainPassword.first) }}
                     <div class="input-group">
@@ -92,40 +214,98 @@
                     {{ form_errors(registrationForm.plainPassword.second) }}
                 </div>
 
+                {# ── TÉRMINOS ────────────────────────────────────────────── #}
                 <div class="mb-4 form-check">
                     {{ form_widget(registrationForm.agreeTerms) }}
                     {{ form_label(registrationForm.agreeTerms) }}
                     {{ form_errors(registrationForm.agreeTerms) }}
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                <button type="submit" class="btn btn-auth-primary w-100">
                     <i class="bi bi-person-plus me-2"></i>Crear Cuenta
                 </button>
 
                 {{ form_end(registrationForm) }}
 
-                <hr class="my-4">
+                <div class="d-flex align-items-center my-4">
+                    <hr class="flex-grow-1"><span class="px-3 text-muted small">o</span><hr class="flex-grow-1">
+                </div>
                 <p class="text-center text-muted small mb-0">
                     ¿Ya tienes cuenta?
-                    <a href="{{ path('app_login') }}" class="text-primary fw-semibold text-decoration-none">Inicia sesión</a>
+                    <a href="{{ path('app_login') }}" class="fw-semibold text-decoration-none" style="color:var(--sb-primary)">Inicia sesión</a>
                 </p>
             </div>
         </div>
+
+        <p class="text-center text-white-50 small mt-4 mb-0">
+            &copy; {{ "now"|date("Y") }} SmartBooking · Todos los derechos reservados
+        </p>
+    </div>
     </div>
 </div>
 {% endblock %}
 
 {% block javascripts %}
+<style>
+    .user-type-card {
+        transition: all .2s ease;
+        cursor: pointer;
+        border-color: #e2e8f0 !important;
+        border-radius: 10px !important;
+    }
+    .user-type-card.active {
+        border-color: var(--sb-primary) !important;
+        background-color: var(--sb-primary-light);
+        box-shadow: 0 0 0 3px rgba(99,102,241,.15);
+    }
+    .user-type-card.active i { color: var(--sb-primary) !important; }
+    .user-type-card:hover:not(.active) {
+        border-color: #a5b4fc !important;
+        background-color: #f8fafc;
+        transform: translateY(-1px);
+    }
+</style>
 <script>
+// ── Toggle tipo de usuario ────────────────────────────────────────────────────
+(function () {
+    const cards      = document.querySelectorAll('.user-type-card');
+    const selectEl   = document.getElementById('{{ registrationForm.userType.vars.id }}');
+    const pFields    = document.getElementById('fieldsPersona');
+    const eFields    = document.getElementById('fieldsEmpresa');
+
+    function switchType(type) {
+        cards.forEach(c => c.classList.toggle('active', c.dataset.type === type));
+        selectEl.value = type;
+        if (type === 'empresa') {
+            pFields.classList.add('d-none');
+            eFields.classList.remove('d-none');
+        } else {
+            eFields.classList.add('d-none');
+            pFields.classList.remove('d-none');
+        }
+    }
+
+    cards.forEach(card => {
+        card.addEventListener('click', () => switchType(card.dataset.type));
+        card.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchType(card.dataset.type); }
+        });
+    });
+
+    // Restaurar selección si hay error de validación (POST devuelto)
+    if (selectEl.value === 'empresa') switchType('empresa');
+})();
+
+// ── Mostrar/ocultar contraseña ────────────────────────────────────────────────
 function togglePassword(id, btn) {
     const inp = document.getElementById(id);
     if (inp.type === 'password') { inp.type = 'text'; btn.querySelector('i').className = 'bi bi-eye-slash'; }
     else { inp.type = 'password'; btn.querySelector('i').className = 'bi bi-eye'; }
 }
 
-// Password strength meter
+// ── Medidor de fortaleza de contraseña ───────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-    const pwInput = document.querySelector('input[type="password"]');
+    const pwInput = document.getElementById('{{ registrationForm.plainPassword.first.vars.id }}');
     if (!pwInput) return;
     pwInput.addEventListener('input', () => {
         const val = pwInput.value;

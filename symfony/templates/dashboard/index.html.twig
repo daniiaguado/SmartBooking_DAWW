@@ -5,144 +5,331 @@
 
 {% block body %}
 
-{# KPI Cards #}
-<div class="row g-3 mb-4">
-    <div class="col-sm-6 col-xl-3">
-        <div class="sb-card p-3 d-flex align-items-center gap-3">
-            <div class="rounded-3 d-flex align-items-center justify-content-center text-white bg-warning"
-                 style="width:50px;height:50px;font-size:1.4rem">
-                <i class="bi bi-hourglass-split"></i>
-            </div>
-            <div>
-                <div class="fs-3 fw-bold">{{ stats.pendiente }}</div>
-                <div class="text-muted small">Pendientes</div>
-            </div>
-        </div>
+{# ── A) HEADER DE BIENVENIDA ────────────────────────────────────────────── #}
+<div class="dashboard-header d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+        <h2 class="dashboard-greeting mb-1">
+            Bienvenido de vuelta, {{ app.user.displayName }} 👋
+        </h2>
+        <p class="dashboard-date mb-0">
+            <i class="bi bi-calendar3 me-1 text-primary"></i>
+            {{ "now"|date("l, d 'de' MMMM 'de' Y")|capitalize }}
+        </p>
     </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="sb-card p-3 d-flex align-items-center gap-3">
-            <div class="rounded-3 d-flex align-items-center justify-content-center text-white bg-success"
-                 style="width:50px;height:50px;font-size:1.4rem">
-                <i class="bi bi-check-circle-fill"></i>
-            </div>
-            <div>
-                <div class="fs-3 fw-bold">{{ stats.confirmada }}</div>
-                <div class="text-muted small">Confirmadas</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="sb-card p-3 d-flex align-items-center gap-3">
-            <div class="rounded-3 d-flex align-items-center justify-content-center text-white bg-danger"
-                 style="width:50px;height:50px;font-size:1.4rem">
-                <i class="bi bi-x-circle-fill"></i>
-            </div>
-            <div>
-                <div class="fs-3 fw-bold">{{ stats.cancelada }}</div>
-                <div class="text-muted small">Canceladas</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="sb-card p-3 d-flex align-items-center gap-3">
-            <div class="rounded-3 d-flex align-items-center justify-content-center text-white bg-primary"
-                 style="width:50px;height:50px;font-size:1.4rem">
-                <i class="bi bi-building"></i>
-            </div>
-            <div>
-                <div class="fs-3 fw-bold">{{ total_recursos }}</div>
-                <div class="text-muted small">Recursos activos</div>
-            </div>
-        </div>
-    </div>
+    <a href="{{ path('app_booking_new') }}" class="btn btn-primary btn-lg px-4">
+        <i class="bi bi-plus-circle me-2"></i>Nueva reserva
+    </a>
 </div>
 
-{# Quick actions #}
+{# ── B) FILA DE KPI CARDS ───────────────────────────────────────────────── #}
 <div class="row g-3 mb-4">
-    <div class="col-md-6">
-        <div class="sb-card p-4 h-100 d-flex align-items-center justify-content-between">
-            <div>
-                <h5 class="fw-bold mb-1">Nueva Reserva</h5>
-                <p class="text-muted small mb-0">Reserva un espacio o equipo ahora</p>
-            </div>
-            <a href="{{ path('app_booking_new') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg me-1"></i>Reservar
-            </a>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="sb-card p-4 h-100 d-flex align-items-center justify-content-between">
-            <div>
-                <h5 class="fw-bold mb-1">Ver Recursos</h5>
-                <p class="text-muted small mb-0">Explora los espacios disponibles</p>
-            </div>
-            <a href="{{ path('app_resource_index') }}" class="btn btn-outline-primary">
-                <i class="bi bi-eye me-1"></i>Ver todos
-            </a>
-        </div>
-    </div>
-</div>
 
-{# Recent bookings #}
-<div class="sb-card">
-    <div class="card-header bg-transparent border-0 pt-3 pb-0 px-4 d-flex align-items-center justify-content-between">
-        <h5 class="fw-bold mb-0"><i class="bi bi-clock-history me-2 text-primary"></i>Mis últimas reservas</h5>
-        <a href="{{ path('app_booking_index') }}" class="btn btn-sm btn-outline-secondary">Ver todas</a>
+    {# Total Reservas #}
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card sb-card p-4">
+            <div class="d-flex align-items-start justify-content-between">
+                <div>
+                    <div class="kpi-value">{{ total_reservas ?? 0 }}</div>
+                    <div class="kpi-label">Total reservas</div>
+                </div>
+                <div class="kpi-icon kpi-icon-indigo">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+            </div>
+            <div class="kpi-trend mt-3">
+                <span class="kpi-trend-badge kpi-trend-indigo">
+                    <i class="bi bi-bar-chart-line me-1"></i>Histórico
+                </span>
+            </div>
+        </div>
     </div>
-    <div class="card-body px-4">
-        {% if mis_reservas is empty %}
-            <div class="text-center py-5">
-                <i class="bi bi-calendar-x display-4 text-muted"></i>
-                <p class="text-muted mt-3">Aún no tienes reservas.</p>
-                <a href="{{ path('app_booking_new') }}" class="btn btn-primary">
-                    <i class="bi bi-plus-circle me-1"></i>Hacer mi primera reserva
+
+    {# Confirmadas #}
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card sb-card p-4">
+            <div class="d-flex align-items-start justify-content-between">
+                <div>
+                    <div class="kpi-value text-success-emphasis">{{ reservas_confirmadas ?? 0 }}</div>
+                    <div class="kpi-label">Confirmadas</div>
+                </div>
+                <div class="kpi-icon kpi-icon-success">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+            </div>
+            <div class="kpi-trend mt-3">
+                <span class="kpi-trend-badge kpi-trend-success">
+                    <i class="bi bi-check2-all me-1"></i>Activas
+                </span>
+            </div>
+        </div>
+    </div>
+
+    {# Pendientes #}
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card sb-card p-4">
+            <div class="d-flex align-items-start justify-content-between">
+                <div>
+                    <div class="kpi-value" style="color:#92400e">{{ reservas_pendientes ?? 0 }}</div>
+                    <div class="kpi-label">Pendientes</div>
+                </div>
+                <div class="kpi-icon kpi-icon-warning">
+                    <i class="bi bi-clock"></i>
+                </div>
+            </div>
+            <div class="kpi-trend mt-3">
+                <span class="kpi-trend-badge kpi-trend-warning">
+                    <i class="bi bi-hourglass-split me-1"></i>Por confirmar
+                </span>
+            </div>
+        </div>
+    </div>
+
+    {# Recursos disponibles #}
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card sb-card p-4">
+            <div class="d-flex align-items-start justify-content-between">
+                <div>
+                    <div class="kpi-value" style="color:#1e40af">{{ total_recursos ?? 0 }}</div>
+                    <div class="kpi-label">Recursos activos</div>
+                </div>
+                <div class="kpi-icon kpi-icon-info">
+                    <i class="bi bi-building"></i>
+                </div>
+            </div>
+            <div class="kpi-trend mt-3">
+                <a href="{{ path('app_resource_index') }}" class="kpi-trend-badge kpi-trend-info text-decoration-none">
+                    <i class="bi bi-eye me-1"></i>Ver todos
                 </a>
             </div>
-        {% else %}
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Recurso</th>
-                            <th>Inicio</th>
-                            <th>Fin</th>
-                            <th>Asistentes</th>
-                            <th>Estado</th>
-                            <th>Precio</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for booking in mis_reservas|slice(0, 5) %}
-                        <tr>
-                            <td>
-                                <strong>{{ booking.resource.nombre }}</strong>
-                                {% if booking.resource.category %}
-                                    <br><small class="text-muted">{{ booking.resource.category.nombre }}</small>
-                                {% endif %}
-                            </td>
-                            <td>{{ booking.fechaInicio|date('d/m/Y H:i') }}</td>
-                            <td>{{ booking.fechaFin|date('d/m/Y H:i') }}</td>
-                            <td><i class="bi bi-people me-1"></i>{{ booking.asistentes }}</td>
-                            <td>
-                                <span class="badge badge-{{ booking.estado }}">
+        </div>
+    </div>
+
+</div>
+
+{# ── C) FILA DOS COLUMNAS: ÚLTIMAS + PRÓXIMAS ───────────────────────────── #}
+<div class="row g-4 mb-4">
+
+    {# Columna izquierda — Últimas reservas #}
+    <div class="col-lg-8">
+        <div class="sb-card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="fw-bold mb-0">
+                    <i class="bi bi-clock-history me-2 text-primary"></i>Últimas reservas
+                </h5>
+                <a href="{{ path('app_booking_index') }}" class="btn btn-sm btn-outline-secondary">
+                    Ver todas
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if reservas_recientes is empty %}
+                    <div class="text-center py-5 px-4">
+                        <i class="bi bi-calendar-x display-4 text-muted"></i>
+                        <p class="text-muted mt-3 mb-3">No hay reservas registradas aún.</p>
+                        <a href="{{ path('app_booking_new') }}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-plus-circle me-1"></i>Crear primera reserva
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Recurso</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in reservas_recientes %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">{{ booking.resource.nombre }}</div>
+                                        {% if app.user.isEmpresa() %}
+                                            <small class="text-muted">{{ booking.user.displayName }}</small>
+                                        {% elseif booking.resource.category is defined and booking.resource.category %}
+                                            <small class="text-muted">{{ booking.resource.category.nombre }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="fw-medium">{{ booking.fechaInicio|date('d/m/Y') }}</span>
+                                        <br><small class="text-muted">{{ booking.fechaInicio|date('H:i') }} – {{ booking.fechaFin|date('H:i') }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-{{ booking.estado }}">
+                                            {{ booking.estado|capitalize }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{{ path('app_booking_show', {id: booking.id}) }}"
+                                           class="btn btn-sm btn-outline-primary me-1" title="Ver">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ path('app_booking_edit', {id: booking.id}) }}"
+                                           class="btn btn-sm btn-outline-secondary" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer bg-transparent border-top text-center py-2">
+                        <a href="{{ path('app_booking_index') }}" class="text-primary fw-medium small text-decoration-none">
+                            Ver todas las reservas <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# Columna derecha — Próximas reservas #}
+    <div class="col-lg-4">
+        <div class="sb-card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="fw-bold mb-0">
+                    <i class="bi bi-calendar-event me-2 text-primary"></i>Próximas
+                </h5>
+                <a href="{{ path('app_calendar') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-calendar3 me-1"></i>Calendario
+                </a>
+            </div>
+            <div class="card-body">
+                {% if proximas_reservas is empty %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-calendar-check display-5 text-muted"></i>
+                        <p class="text-muted mt-2 mb-3 small">No hay reservas próximas.</p>
+                        <a href="{{ path('app_booking_new') }}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-plus-circle me-1"></i>Crear reserva
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="upcoming-list">
+                        {% for booking in proximas_reservas %}
+                        <a href="{{ path('app_booking_show', {id: booking.id}) }}" class="text-decoration-none">
+                            <div class="upcoming-item">
+                                <div class="upcoming-dot
+                                    {% if booking.estado == 'confirmada' %}upcoming-dot-success
+                                    {% elseif booking.estado == 'cancelada' %}upcoming-dot-danger
+                                    {% else %}upcoming-dot-warning{% endif %}">
+                                </div>
+                                <div class="flex-grow-1 overflow-hidden">
+                                    <div class="fw-semibold text-dark text-truncate" style="font-size:.875rem">
+                                        {{ booking.resource.nombre }}
+                                    </div>
+                                    <div class="text-muted" style="font-size:.775rem">
+                                        <i class="bi bi-clock me-1"></i>
+                                        {{ booking.fechaInicio|date('d/m H:i') }} – {{ booking.fechaFin|date('H:i') }}
+                                    </div>
+                                </div>
+                                <span class="badge badge-{{ booking.estado }} flex-shrink-0">
                                     {{ booking.estado|capitalize }}
                                 </span>
-                            </td>
-                            <td>{% if booking.precioTotal %}{{ booking.precioTotal }}€{% else %}—{% endif %}</td>
-                            <td>
-                                <a href="{{ path('app_booking_show', {id: booking.id}) }}"
-                                   class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                            </td>
-                        </tr>
+                            </div>
+                        </a>
                         {% endfor %}
-                    </tbody>
-                </table>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ path('app_calendar') }}" class="text-primary fw-medium small text-decoration-none">
+                            Ver calendario <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                {% endif %}
             </div>
-        {% endif %}
+        </div>
     </div>
+
 </div>
+
+{# ── D) SOLO EMPRESA: ESTADÍSTICAS AVANZADAS ────────────────────────────── #}
+{% if app.user.isEmpresa() %}
+<div class="row g-4">
+
+    {# Barras de progreso por estado #}
+    <div class="col-lg-8">
+        <div class="sb-card p-4">
+            <h5 class="fw-bold mb-4">
+                <i class="bi bi-bar-chart-fill me-2 text-primary"></i>Distribución de reservas
+            </h5>
+            {% set total = (reservas_confirmadas ?? 0) + (reservas_pendientes ?? 0) + (reservas_canceladas ?? 0) %}
+            {% set total = total > 0 ? total : 1 %}
+
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="fw-medium small">
+                        <i class="bi bi-check-circle me-1 text-success"></i>Confirmadas
+                    </span>
+                    <span class="fw-bold small text-success">{{ reservas_confirmadas ?? 0 }}</span>
+                </div>
+                <div class="progress" style="height:10px;border-radius:99px">
+                    <div class="progress-bar bg-success"
+                         style="width:{{ ((reservas_confirmadas ?? 0) / total * 100)|round }}%;border-radius:99px">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="fw-medium small">
+                        <i class="bi bi-clock me-1" style="color:#f59e0b"></i>Pendientes
+                    </span>
+                    <span class="fw-bold small" style="color:#92400e">{{ reservas_pendientes ?? 0 }}</span>
+                </div>
+                <div class="progress" style="height:10px;border-radius:99px">
+                    <div class="progress-bar" style="background:#f59e0b;width:{{ ((reservas_pendientes ?? 0) / total * 100)|round }}%;border-radius:99px">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="fw-medium small">
+                        <i class="bi bi-x-circle me-1 text-danger"></i>Canceladas
+                    </span>
+                    <span class="fw-bold small text-danger">{{ reservas_canceladas ?? 0 }}</span>
+                </div>
+                <div class="progress" style="height:10px;border-radius:99px">
+                    <div class="progress-bar bg-danger"
+                         style="width:{{ ((reservas_canceladas ?? 0) / total * 100)|round }}%;border-radius:99px">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Resumen empresa #}
+    <div class="col-lg-4">
+        <div class="sb-card p-4 h-100 d-flex flex-column">
+            <h5 class="fw-bold mb-3">
+                <i class="bi bi-building me-2 text-info"></i>Panel empresa
+            </h5>
+            <div class="rounded-3 bg-primary bg-opacity-10 p-3 mb-3 d-flex align-items-center gap-3">
+                <div class="rounded-3 bg-primary bg-opacity-25 d-flex align-items-center justify-content-center"
+                     style="width:44px;height:44px;font-size:1.3rem">
+                    <i class="bi bi-building text-primary"></i>
+                </div>
+                <div>
+                    <div class="fw-bold">{{ app.user.nombreEmpresa }}</div>
+                    {% if app.user.cif %}<small class="text-muted">CIF: {{ app.user.cif }}</small>{% endif %}
+                </div>
+            </div>
+            <div class="d-grid gap-2 mt-auto">
+                <a href="{{ path('app_booking_new') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i>Nueva reserva
+                </a>
+                <a href="{{ path('app_booking_index') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-calendar3 me-1"></i>Ver todas las reservas
+                </a>
+                <a href="{{ path('app_resource_index') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-grid me-1"></i>Gestionar recursos
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endif %}
 
 {% endblock %}

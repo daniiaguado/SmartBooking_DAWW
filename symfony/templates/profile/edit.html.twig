@@ -1,0 +1,178 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar Perfil{% endblock %}
+{% block page_title %}<i class="bi bi-pencil-square me-2"></i>Editar Perfil{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+        {# ── Datos de cuenta ──────────────────────────────────────────────── #}
+        <div class="sb-card card mb-4">
+            <div class="card-header bg-transparent pt-4 pb-0 px-4 border-0">
+                <h6 class="text-uppercase text-muted fw-semibold mb-0" style="font-size:.75rem;letter-spacing:.08em">
+                    <i class="bi bi-envelope me-1"></i>Datos de cuenta
+                </h6>
+                <p class="text-muted small mt-1 mb-3">Los campos marcados con <span class="text-danger">*</span> son obligatorios.</p>
+            </div>
+            <div class="card-body px-4 pt-2 pb-4">
+                <div class="mb-3">
+                    {{ form_label(form.email) }}
+                    {{ form_widget(form.email) }}
+                    {{ form_errors(form.email) }}
+                </div>
+            </div>
+        </div>
+
+        {# ── Datos de persona o empresa ───────────────────────────────────── #}
+        {% if user.userType == 'persona' %}
+        <div class="sb-card card mb-4">
+            <div class="card-header bg-transparent pt-4 pb-0 px-4 border-0">
+                <h6 class="text-uppercase text-muted fw-semibold mb-0" style="font-size:.75rem;letter-spacing:.08em">
+                    <i class="bi bi-person me-1"></i>Datos personales
+                </h6>
+            </div>
+            <div class="card-body px-4 pt-3 pb-4">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            {{ form_label(form.nombre) }}
+                            {{ form_widget(form.nombre) }}
+                            {{ form_errors(form.nombre) }}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            {{ form_label(form.apellidos) }}
+                            {{ form_widget(form.apellidos) }}
+                            {{ form_errors(form.apellidos) }}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            {{ form_label(form.dni) }}
+                            {{ form_widget(form.dni) }}
+                            {{ form_errors(form.dni) }}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            {{ form_label(form.telefono) }}
+                            {{ form_widget(form.telefono) }}
+                            {{ form_errors(form.telefono) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="sb-card card mb-4">
+            <div class="card-header bg-transparent pt-4 pb-0 px-4 border-0">
+                <h6 class="text-uppercase text-muted fw-semibold mb-0" style="font-size:.75rem;letter-spacing:.08em">
+                    <i class="bi bi-building me-1"></i>Datos de empresa
+                </h6>
+            </div>
+            <div class="card-body px-4 pt-3 pb-4">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            {{ form_label(form.nombreEmpresa) }}
+                            {{ form_widget(form.nombreEmpresa) }}
+                            {{ form_errors(form.nombreEmpresa) }}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            {{ form_label(form.cif) }}
+                            {{ form_widget(form.cif) }}
+                            {{ form_errors(form.cif) }}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            {{ form_label(form.sector) }}
+                            {{ form_widget(form.sector) }}
+                            {{ form_errors(form.sector) }}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            {{ form_label(form.telefonoEmpresa) }}
+                            {{ form_widget(form.telefonoEmpresa) }}
+                            {{ form_errors(form.telefonoEmpresa) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# ── Cambiar contraseña (colapsable) ─────────────────────────────── #}
+        <div class="sb-card card mb-4">
+            <div class="card-header bg-transparent border-0 px-4 pt-4 pb-0">
+                <button class="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-2 w-100"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapsePassword"
+                        aria-expanded="false"
+                        aria-controls="collapsePassword">
+                    <h6 class="text-uppercase text-muted fw-semibold mb-0" style="font-size:.75rem;letter-spacing:.08em">
+                        <i class="bi bi-lock me-1"></i>Cambiar contraseña
+                    </h6>
+                    <i class="bi bi-chevron-down text-muted ms-auto" style="font-size:.85rem"></i>
+                </button>
+                <p class="text-muted small mt-1 mb-3">Déjalo en blanco si no quieres cambiarla.</p>
+            </div>
+            <div class="collapse" id="collapsePassword">
+                <div class="card-body px-4 pt-0 pb-4">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                {{ form_label(form.plainPassword.first) }}
+                                {{ form_widget(form.plainPassword.first) }}
+                                {{ form_errors(form.plainPassword.first) }}
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                {{ form_label(form.plainPassword.second) }}
+                                {{ form_widget(form.plainPassword.second) }}
+                                {{ form_errors(form.plainPassword.second) }}
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_errors(form.plainPassword) }}
+                </div>
+            </div>
+        </div>
+
+        {# ── Acciones ─────────────────────────────────────────────────────── #}
+        <div class="d-flex gap-2 justify-content-end mb-4">
+            <a href="{{ path('app_profile_show') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle me-1"></i>Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle me-1"></i>Guardar cambios
+            </button>
+        </div>
+
+        {{ form_end(form) }}
+
+    </div>
+</div>
+
+<script>
+    // Expandir automáticamente el accordion de contraseña si hay errores en él
+    document.addEventListener('DOMContentLoaded', () => {
+        const pwFields = document.querySelectorAll('#collapsePassword .is-invalid');
+        if (pwFields.length > 0) {
+            const collapse = document.getElementById('collapsePassword');
+            if (collapse) {
+                new bootstrap.Collapse(collapse, { show: true });
+            }
+        }
+    });
+</script>
+{% endblock %}

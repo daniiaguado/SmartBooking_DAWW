@@ -1,0 +1,131 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Directorio de Empresas{% endblock %}
+{% block page_title %}<i class="bi bi-building-fill me-2 text-primary"></i>Directorio de Empresas{% endblock %}
+
+{% block body %}
+
+{# Barra de búsqueda local #}
+<div class="sb-card mb-4">
+    <div class="card-body py-3 px-4">
+        <div class="row align-items-center g-2">
+            <div class="col">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" id="localSearch" class="form-control"
+                           placeholder="Buscar empresa por nombre…" autocomplete="off">
+                </div>
+            </div>
+            <div class="col-auto">
+                <span class="badge bg-secondary fs-6" id="countBadge">{{ empresas|length }}</span>
+                <span class="text-muted small ms-1">empresas</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if empresas is empty %}
+    <div class="text-center py-5">
+        <i class="bi bi-building display-4 text-muted"></i>
+        <p class="text-muted mt-3 mb-0">No hay empresas registradas todavía.</p>
+    </div>
+{% else %}
+    <div class="row g-3" id="empresasGrid">
+        {% for empresa in empresas %}
+        <div class="col-md-6 col-xl-4 empresa-card-col"
+             data-nombre="{{ empresa.nombreEmpresa|lower }}">
+            <div class="sb-card h-100">
+                <div class="card-body p-4 d-flex flex-column">
+                    {# Cabecera con avatar + badge #}
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="sb-user-avatar flex-shrink-0" style="width:48px;height:48px;font-size:1rem;border-radius:12px;">
+                            {{ empresa.initials }}
+                        </div>
+                        <div class="flex-grow-1 min-w-0">
+                            <h6 class="fw-bold mb-0 text-truncate" title="{{ empresa.nombreEmpresa }}">
+                                {{ empresa.nombreEmpresa }}
+                            </h6>
+                            <span class="badge"
+                                  style="background:rgba(14,165,233,.15);color:#0369a1;font-size:.7rem">
+                                <i class="bi bi-building me-1"></i>Empresa
+                            </span>
+                        </div>
+                    </div>
+
+                    {# Datos de la empresa #}
+                    <ul class="list-unstyled mb-3 flex-grow-1 small">
+                        {% if empresa.cif %}
+                        <li class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-card-text text-muted" style="width:16px"></i>
+                            <span class="text-muted">CIF:</span>
+                            <span class="fw-semibold">{{ empresa.cif }}</span>
+                        </li>
+                        {% endif %}
+                        {% if empresa.sector %}
+                        <li class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-briefcase text-muted" style="width:16px"></i>
+                            <span class="text-muted">Sector:</span>
+                            <span class="fw-semibold">{{ empresa.sector }}</span>
+                        </li>
+                        {% endif %}
+                        {% if empresa.telefonoEmpresa %}
+                        <li class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-telephone text-muted" style="width:16px"></i>
+                            <span class="fw-semibold">{{ empresa.telefonoEmpresa }}</span>
+                        </li>
+                        {% endif %}
+                        <li class="d-flex align-items-center gap-2">
+                            <i class="bi bi-envelope text-muted" style="width:16px"></i>
+                            <span class="text-truncate fw-semibold" title="{{ empresa.email }}">
+                                {{ empresa.email }}
+                            </span>
+                        </li>
+                    </ul>
+
+                    {# Botón hacer reserva #}
+                    <a href="{{ path('app_booking_new', {empresa: empresa.id}) }}"
+                       class="btn btn-primary btn-sm w-100 mt-auto">
+                        <i class="bi bi-plus-circle me-1"></i>Hacer reserva
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {# Mensaje sin resultados de búsqueda local #}
+    <div class="text-center py-5 d-none" id="noResultsMsg">
+        <i class="bi bi-search display-4 text-muted"></i>
+        <p class="text-muted mt-3">No se encontró ninguna empresa con ese nombre.</p>
+    </div>
+{% endif %}
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const input     = document.getElementById('localSearch');
+    const cards     = document.querySelectorAll('.empresa-card-col');
+    const badge     = document.getElementById('countBadge');
+    const noResults = document.getElementById('noResultsMsg');
+
+    if (!input) return;
+
+    input.addEventListener('input', () => {
+        const q = input.value.toLowerCase().trim();
+        let visible = 0;
+
+        cards.forEach(col => {
+            const nombre = col.dataset.nombre || '';
+            const match  = !q || nombre.includes(q);
+            col.style.display = match ? '' : 'none';
+            if (match) visible++;
+        });
+
+        if (badge) badge.textContent = visible;
+        if (noResults) noResults.classList.toggle('d-none', visible > 0);
+    });
+});
+</script>
+{% endblock %}

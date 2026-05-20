@@ -6,31 +6,63 @@
 {% block body %}
 <div class="row justify-content-center">
     <div class="col-lg-8">
+
+        {# Card informativa si la reserva es para una empresa concreta #}
+        {% if empresa is defined and empresa %}
+        <div class="alert mb-3 d-flex align-items-center gap-3"
+             style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;color:#1e40af">
+            <div class="flex-shrink-0 sb-user-avatar"
+                 style="width:44px;height:44px;font-size:.95rem;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1d4ed8)">
+                {{ empresa.initials }}
+            </div>
+            <div class="flex-grow-1">
+                <div class="fw-bold" style="font-size:.95rem">
+                    <i class="bi bi-building me-1"></i>
+                    Haciendo reserva para: <strong>{{ empresa.nombreEmpresa }}</strong>
+                </div>
+                <div class="small mt-1" style="color:#3b82f6">
+                    {% if empresa.cif %}<span class="me-3"><i class="bi bi-card-text me-1"></i>CIF: {{ empresa.cif }}</span>{% endif %}
+                    {% if empresa.sector %}<span><i class="bi bi-briefcase me-1"></i>{{ empresa.sector }}</span>{% endif %}
+                </div>
+            </div>
+            <a href="{{ path('app_empresas_index') }}"
+               class="btn btn-sm flex-shrink-0"
+               style="background:rgba(59,130,246,.12);color:#1d4ed8;border:1px solid #bfdbfe">
+                <i class="bi bi-arrow-left me-1"></i>Cambiar
+            </a>
+        </div>
+        {% endif %}
+
         <div class="sb-card">
             <div class="card-body p-4">
 
                 <app-form-validator form-id="bookingForm"></app-form-validator>
 
                 {{ form_start(form, {'attr': {'id': 'bookingForm', 'novalidate': 'novalidate'}}) }}
+                {{ form_widget(form.empresaId) }}
 
                 <div class="mb-4">
-                    {{ form_label(form.resource) }}
+                    {{ form_label(form.resource, 'Recurso <span class="text-danger">*</span>', {'label_html': true}) }}
                     {{ form_widget(form.resource) }}
                     {{ form_errors(form.resource) }}
                     <div class="form-text">
                         <i class="bi bi-info-circle me-1"></i>
                         El precio total se calculará automáticamente según la duración.
                     </div>
+                    <div class="form-text text-secondary">
+                        <i class="bi bi-calendar-check me-1"></i>
+                        Selecciona fechas y recurso para comprobar disponibilidad. La verificación de conflictos se realiza al enviar el formulario.
+                    </div>
                 </div>
 
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
-                        {{ form_label(form.fechaInicio) }}
+                        {{ form_label(form.fechaInicio, 'Fecha y hora de inicio <span class="text-danger">*</span>', {'label_html': true}) }}
                         {{ form_widget(form.fechaInicio) }}
                         {{ form_errors(form.fechaInicio) }}
                     </div>
                     <div class="col-md-6">
-                        {{ form_label(form.fechaFin) }}
+                        {{ form_label(form.fechaFin, 'Fecha y hora de fin <span class="text-danger">*</span>', {'label_html': true}) }}
                         {{ form_widget(form.fechaFin) }}
                         {{ form_errors(form.fechaFin) }}
                     </div>
@@ -44,7 +76,7 @@
                 </div>
 
                 <div class="mb-4">
-                    {{ form_label(form.asistentes) }}
+                    {{ form_label(form.asistentes, 'Número de asistentes <span class="text-danger">*</span>', {'label_html': true}) }}
                     {{ form_widget(form.asistentes) }}
                     {{ form_errors(form.asistentes) }}
                 </div>
@@ -62,6 +94,8 @@
                 </div>
                 {% endif %}
 
+                <p class="text-muted small mb-3"><span class="text-danger">*</span> Campos obligatorios</p>
+
                 <div class="d-flex gap-2 justify-content-end">
                     <a href="{{ path('app_booking_index') }}" class="btn btn-outline-secondary">
                         <i class="bi bi-arrow-left me-1"></i>Cancelar
@@ -77,6 +111,7 @@
     </div>
 </div>
 {% endblock %}
+
 
 {% block javascripts %}
 <script>

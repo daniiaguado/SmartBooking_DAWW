@@ -8,6 +8,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -17,9 +18,15 @@ class BookingType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $isAdmin = $options['is_admin'];
+        $isAdmin   = $options['is_admin'];
+        $empresaId = $options['empresa_id'];
 
         $builder
+            ->add('empresaId', HiddenType::class, [
+                'mapped'   => false,
+                'required' => false,
+                'data'     => $empresaId,
+            ])
             ->add('resource', EntityType::class, [
                 'class'        => Resource::class,
                 'choice_label' => fn(Resource $r) => sprintf('%s (Cap. %d – %.2f€/h)', $r->getNombre(), $r->getCapacidad(), $r->getPrecioHora()),
@@ -69,6 +76,7 @@ class BookingType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Booking::class,
             'is_admin'   => false,
+            'empresa_id' => null,
         ]);
     }
 }
