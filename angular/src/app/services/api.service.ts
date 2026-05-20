@@ -43,8 +43,14 @@ export class ApiService {
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     let message = 'Error desconocido';
-    if (error.error?.error) {
+    if (error.status === 403) {
+      message = 'No tienes permiso para acceder a esta reserva';
+    } else if (error.error?.error) {
       message = error.error.error;
+    } else if (error.error?.message) {
+      message = error.error.message;
+    } else if (error.error?.detail) {
+      message = error.error.detail;
     } else if (error.error?.errors?.length) {
       message = error.error.errors.join(', ');
     } else if (error.message) {

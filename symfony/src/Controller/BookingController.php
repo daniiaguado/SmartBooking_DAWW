@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Booking;
+use App\Entity\User;
 use App\Form\BookingType;
 use App\Repository\BookingRepository;
 use App\Repository\ResourceRepository;
@@ -28,10 +29,15 @@ class BookingController extends AbstractController
         $desde      = $request->query->get('desde') ? new \DateTime($request->query->get('desde')) : null;
         $hasta      = $request->query->get('hasta') ? new \DateTime($request->query->get('hasta')) : null;
 
+        /** @var User $user */
+        $user = $this->getUser();
+
         if ($isAdmin) {
             $bookings = $repo->findWithFilters($estado, $desde, $hasta, $resourceId);
+        } elseif (($this->isGranted('ROLE_EMPRESA') || $user->isEmpresa()) && !$isAdmin) {
+            $bookings = $repo->findByClienteNombre($user->getNombreEmpresa() ?? '');
         } else {
-            $bookings = $repo->findByUserOrdered($this->getUser());
+            $bookings = $repo->findByUserOrdered($user);
         }
 
         return $this->render('booking/index.html.twig', [
@@ -44,6 +50,10 @@ class BookingController extends AbstractController
     #[Route('/new', name: 'app_booking_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em, BookingRepository $repo, UserRepository $userRepo): Response
     {
+        if ($this->isGranted('ROLE_EMPRESA') && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('Las empresas no pueden crear reservas.');
+        }
+
         $booking = new Booking();
 
         // Empresa preseleccionada vía ?empresa=ID
@@ -210,8 +220,24 @@ class BookingController extends AbstractController
 
     private function denyAccessIfNotOwnerOrAdmin(Booking $booking): void
     {
-        if (!$this->isGranted('ROLE_ADMIN') && $booking->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('No tienes permiso para acceder a esta reserva.');
+        if ($this->isGranted('ROLE_ADMIN')) {
+            return;
         }
+
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if ($this->isGranted('ROLE_EMPRESA') || $user->isEmpresa()) {
+            $nombreEmpresa = $user->getNombreEmpresa() ?? '';
+            if ($booking->getClienteNombre() === $nombreEmpresa) {
+                return;
+            }
+        }
+
+        if ($booking->getUser() === $user) {
+            return;
+        }
+
+        throw $this->createAccessDeniedException('No tienes permiso para acceder a esta reserva.');
     }
 }

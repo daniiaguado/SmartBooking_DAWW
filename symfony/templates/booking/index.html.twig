@@ -2,7 +2,13 @@
 
 {% block title %}Reservas{% endblock %}
 {% block page_title %}<i class="bi bi-calendar3 me-2 text-primary"></i>
-    {{ is_admin ? 'Todas las Reservas' : 'Mis Reservas' }}
+    {% if is_admin %}
+        Todas las Reservas
+    {% elseif is_granted('ROLE_EMPRESA') %}
+        Reservas recibidas
+    {% else %}
+        Mis Reservas
+    {% endif %}
 {% endblock %}
 
 {% block body %}
@@ -55,18 +61,22 @@
         <h5 class="fw-bold mb-0">
             <span class="badge bg-secondary me-2">{{ bookings|length }}</span>reservas encontradas
         </h5>
+        {% if not is_granted('ROLE_EMPRESA') or is_granted('ROLE_ADMIN') %}
         <a href="{{ path('app_booking_new') }}" class="btn btn-primary btn-sm">
             <i class="bi bi-plus-lg me-1"></i>Nueva Reserva
         </a>
+        {% endif %}
     </div>
     <div class="card-body px-4">
         {% if bookings is empty %}
             <div class="text-center py-5">
                 <i class="bi bi-calendar-x display-4 text-muted"></i>
                 <p class="text-muted mt-3">No se encontraron reservas.</p>
+                {% if not is_granted('ROLE_EMPRESA') or is_granted('ROLE_ADMIN') %}
                 <a href="{{ path('app_booking_new') }}" class="btn btn-primary">
                     <i class="bi bi-plus-circle me-1"></i>Crear reserva
                 </a>
+                {% endif %}
             </div>
         {% else %}
             <div class="table-responsive">

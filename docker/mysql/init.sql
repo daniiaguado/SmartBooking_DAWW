@@ -12,15 +12,26 @@ USE `smartbooking`;
 -- Tabla: user
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `user` (
-  `id`          INT            NOT NULL AUTO_INCREMENT,
-  `email`       VARCHAR(180)   NOT NULL,
-  `roles`       JSON           NOT NULL,
-  `password`    VARCHAR(255)   NOT NULL,
-  `nombre`      VARCHAR(100)   NOT NULL,
-  `apellidos`   VARCHAR(150)   NOT NULL,
-  `telefono`    VARCHAR(20)    DEFAULT NULL,
-  `created_at`  DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `is_active`   TINYINT(1)     NOT NULL DEFAULT 1,
+  `id`                INT            NOT NULL AUTO_INCREMENT,
+  `email`             VARCHAR(180)   NOT NULL,
+  `roles`             JSON           NOT NULL,
+  `password`          VARCHAR(255)   NOT NULL,
+  `user_type`         VARCHAR(10)    NOT NULL DEFAULT 'persona',
+
+  -- Campos persona
+  `nombre`            VARCHAR(100)   DEFAULT NULL,
+  `apellidos`         VARCHAR(150)   DEFAULT NULL,
+  `dni`               VARCHAR(20)    DEFAULT NULL,
+  `telefono`          VARCHAR(20)    DEFAULT NULL,
+
+  -- Campos empresa
+  `nombre_empresa`    VARCHAR(150)   DEFAULT NULL,
+  `cif`               VARCHAR(20)    DEFAULT NULL,
+  `sector`            VARCHAR(100)   DEFAULT NULL,
+  `telefono_empresa`  VARCHAR(20)    DEFAULT NULL,
+
+  `created_at`        DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `is_active`         TINYINT(1)     NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQ_USER_EMAIL` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -58,16 +69,17 @@ CREATE TABLE IF NOT EXISTS `resource` (
 -- Tabla: booking
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `booking` (
-  `id`            INT             NOT NULL AUTO_INCREMENT,
-  `user_id`       INT             NOT NULL,
-  `resource_id`   INT             NOT NULL,
-  `fecha_inicio`  DATETIME        NOT NULL,
-  `fecha_fin`     DATETIME        NOT NULL,
-  `asistentes`    INT             NOT NULL DEFAULT 1,
-  `motivo`        TEXT            DEFAULT NULL,
-  `estado`        ENUM('pendiente','confirmada','cancelada') NOT NULL DEFAULT 'pendiente',
-  `precio_total`  DECIMAL(10,2)  DEFAULT NULL,
-  `created_at`    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `id`              INT             NOT NULL AUTO_INCREMENT,
+  `user_id`         INT             NOT NULL,
+  `resource_id`     INT             NOT NULL,
+  `fecha_inicio`    DATETIME        NOT NULL,
+  `fecha_fin`       DATETIME        NOT NULL,
+  `asistentes`      INT             NOT NULL DEFAULT 1,
+  `motivo`          LONGTEXT        DEFAULT NULL,
+  `estado`          VARCHAR(20)     NOT NULL DEFAULT 'pendiente',
+  `precio_total`    DECIMAL(10,2)  DEFAULT NULL,
+  `cliente_nombre`  VARCHAR(200)    DEFAULT NULL,
+  `created_at`      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_booking_user`
     FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)

@@ -41,6 +41,10 @@ export class AuthService {
     return this.currentUserSubject.value?.isAdmin ?? false;
   }
 
+  get isEmpresa(): boolean {
+    return this.currentUserSubject.value?.userType === 'empresa';
+  }
+
   loadCurrentUser(): Observable<AuthUser> {
     return this.http
       .get<AuthUser>('/api/me', { withCredentials: true })

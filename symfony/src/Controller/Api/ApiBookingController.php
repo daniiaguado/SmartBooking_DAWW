@@ -30,7 +30,7 @@ class ApiBookingController extends AbstractController
         $desde      = $request->query->get('desde') ? new \DateTime($request->query->get('desde')) : null;
         $hasta      = $request->query->get('hasta') ? new \DateTime($request->query->get('hasta')) : null;
 
-        $isEmpresa = $user->isEmpresa();
+        $isEmpresa = $this->isGranted('ROLE_EMPRESA') || $user->isEmpresa();
 
         if ($isAdmin) {
             $bookings = $repo->findWithFilters($estado, $desde, $hasta, $resourceId);
@@ -59,6 +59,10 @@ class ApiBookingController extends AbstractController
         BookingRepository $bookingRepo,
         ResourceRepository $resourceRepo
     ): JsonResponse {
+        if ($this->isGranted('ROLE_EMPRESA') && !$this->isGranted('ROLE_ADMIN')) {
+            return $this->json(['error' => 'Las empresas no pueden crear reservas directamente.'], Response::HTTP_FORBIDDEN);
+        }
+
         $data = json_decode($request->getContent(), true);
 
         if (!$data) {
@@ -222,7 +226,7 @@ class ApiBookingController extends AbstractController
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
 
-        if ($user->isEmpresa()) {
+        if ($this->isGranted('ROLE_EMPRESA') || $user->isEmpresa()) {
             $nombreEmpresa = $user->getNombreEmpresa() ?? '';
             if ($booking->getClienteNombre() === $nombreEmpresa) {
                 return;
@@ -256,14 +260,14 @@ class ApiBookingController extends AbstractController
         return [
             'id'            => $b->getId(),
             'estado'        => $b->getEstado(),
-            'fechaInicio'   => $b->getFechaInicio()?->format('Y-m-d H:i:s'),
-            'fechaFin'      => $b->getFechaFin()?->format('Y-m-d H:i:s'),
+            'fechaInicio'   => $b->getFechaInicio()?->format(\DateTimeInterface::ATOM),
+            'fechaFin'      => $b->getFechaFin()?->format(\DateTimeInterface::ATOM),
             'asistentes'    => $b->getAsistentes(),
             'motivo'        => $b->getMotivo(),
             'clienteNombre' => $b->getClienteNombre(),
             'precioTotal'   => $b->getPrecioTotal(),
             'duracionHoras' => $b->getDuracionHoras(),
-            'createdAt'     => $b->getCreatedAt()?->format('Y-m-d H:i:s'),
+            'createdAt'     => $b->getCreatedAt()?->format(\DateTimeInterface::ATOM),
             'resource'      => $b->getResource() ? [
                 'id'          => $b->getResource()->getId(),
                 'nombre'      => $b->getResource()->getNombre(),

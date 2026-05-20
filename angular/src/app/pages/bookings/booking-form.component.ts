@@ -41,6 +41,11 @@ export class BookingFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    if (this.auth.isEmpresa) {
+      this.router.navigate(['/app/dashboard']);
+      return;
+    }
+
     this.bookingId = this.route.snapshot.params['id'] ? +this.route.snapshot.params['id'] : null;
     this.isEdit = !!this.bookingId;
 

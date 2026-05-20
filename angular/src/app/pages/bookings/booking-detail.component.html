@@ -27,7 +27,7 @@
       <i class="bi bi-arrow-left me-1"></i>Volver a reservas
     </button>
     <div class="d-flex gap-2">
-      <button *ngIf="booking.estado !== 'cancelada'"
+      <button *ngIf="!auth.isEmpresa && booking.estado !== 'cancelada'"
               class="btn btn-outline-primary btn-sm"
               [disabled]="actionLoading"
               (click)="irAEditar()">
@@ -40,7 +40,7 @@
         <span *ngIf="actionLoading" class="spinner-border spinner-border-sm me-1"></span>
         <i *ngIf="!actionLoading" class="bi bi-check-circle me-1"></i>Confirmar
       </button>
-      <button *ngIf="booking.estado !== 'cancelada'"
+      <button *ngIf="!auth.isEmpresa && booking.estado !== 'cancelada'"
               class="btn btn-outline-danger btn-sm"
               [disabled]="actionLoading"
               (click)="cancelar()">
