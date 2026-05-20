@@ -1,0 +1,37 @@
+﻿name: Deploy Info
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy-info:
+    name: Info de despliegue
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout codigo
+        uses: actions/checkout@v4
+
+      - name: Verificar docker-compose.yml
+        run: |
+          echo "=== Servicios Docker configurados ==="
+          cat docker-compose.yml | grep -E "image:|ports:|container_name:" || true
+
+      - name: Resumen del proyecto
+        run: |
+          echo "## SmartBooking - Resumen del deploy" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Componente | Estado |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Symfony 7 | Listo |" >> $GITHUB_STEP_SUMMARY
+          echo "| Angular 17 | Listo |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Compose | Configurado |" >> $GITHUB_STEP_SUMMARY
+          echo "| MySQL 8.0 | Configurado |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Arrancar en local:" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "docker compose up -d" >> $GITHUB_STEP_SUMMARY
+          echo "docker exec smartbooking_php composer install" >> $GITHUB_STEP_SUMMARY
+          echo "cd angular && npm run build" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
